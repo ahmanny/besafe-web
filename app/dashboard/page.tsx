@@ -97,17 +97,33 @@ export default function OverviewDashboardPage() {
   const recentAlerts = alerts.slice(0, 7);
   const recentReports = reports.slice(0, 7);
 
-  // Trend & Analytics Data
-  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const weeklyIncidents = [14, 22, 18, 29, 45, 52, 38];
-  const maxWeekly = Math.max(...weeklyIncidents);
+  // Trend & Analytics Data from Real Database Aggregation
+  const weeklyVolume = stats?.weekly_volume && stats.weekly_volume.length > 0
+    ? stats.weekly_volume
+    : [
+        { day: "Mon", count: 0, date: "" },
+        { day: "Tue", count: 0, date: "" },
+        { day: "Wed", count: 0, date: "" },
+        { day: "Thu", count: 0, date: "" },
+        { day: "Fri", count: 0, date: "" },
+        { day: "Sat", count: 0, date: "" },
+        { day: "Sun", count: 0, date: "" },
+      ];
 
-  const categories = [
-    { label: "Voice Threat SOS", count: 48, percentage: "42%", color: "bg-destructive" },
-    { label: "Harassment Reports", count: 28, percentage: "25%", color: "bg-primary" },
-    { label: "Domestic Disturbance", count: 21, percentage: "18%", color: "bg-amber-500" },
-    { label: "Unsafe Ride Distress", count: 17, percentage: "15%", color: "bg-indigo-400" },
-  ];
+  const maxWeekly = Math.max(...weeklyVolume.map((d) => d.count), 1);
+  const peakDay = weeklyVolume.reduce(
+    (max, item) => (item.count > max.count ? item : max),
+    weeklyVolume[0]
+  );
+
+  const categories = stats?.category_distribution && stats.category_distribution.length > 0
+    ? stats.category_distribution
+    : [
+        { label: "Voice Threat SOS", count: 0, percentage: "0%", color: "bg-destructive" },
+        { label: "Harassment Reports", count: 0, percentage: "0%", color: "bg-primary" },
+        { label: "Domestic Disturbance", count: 0, percentage: "0%", color: "bg-amber-500" },
+        { label: "Unsafe Ride Distress", count: 0, percentage: "0%", color: "bg-indigo-400" },
+      ];
 
   const headerTitle = isDispatcher
     ? `Operator Console • ${user?.name || "Dispatcher"}`
@@ -124,7 +140,6 @@ export default function OverviewDashboardPage() {
         title={headerTitle}
         subtitle={headerSubtitle}
         action={
-
           <div className="flex items-center gap-2.5">
             <Button
               variant="outline"
@@ -237,26 +252,31 @@ export default function OverviewDashboardPage() {
               </div>
             </div>
             <span className="text-[10px] font-mono font-bold text-primary px-2 py-0.5 rounded bg-primary/10 border border-primary/20">
-              Peak: Saturday
+              {peakDay?.count && peakDay.count > 0 ? `Peak: ${peakDay.day} (${peakDay.count})` : "Normal Grid Volume"}
             </span>
           </div>
 
           <div className="h-44 flex items-end justify-between gap-2.5 pt-6 pb-1">
-            {weeklyIncidents.map((val, idx) => {
-              const heightPct = Math.round((val / maxWeekly) * 100);
+            {weeklyVolume.map((item, idx) => {
+              const heightPct = item.count > 0 ? Math.max(Math.round((item.count / maxWeekly) * 100), 12) : 6;
               return (
                 <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group">
                   <span className="text-[10px] font-mono text-muted-foreground group-hover:text-foreground font-bold transition-colors">
-                    {val}
+                    {item.count}
                   </span>
                   <div className="w-full bg-muted/40 rounded-xl h-28 flex items-end p-1">
                     <div
                       style={{ height: `${heightPct}%` }}
-                      className="w-full rounded-lg bg-gradient-to-t from-primary/80 to-primary group-hover:from-destructive/80 group-hover:to-destructive transition-all duration-300 shadow-sm"
+                      className={`w-full rounded-lg transition-all duration-300 shadow-sm ${
+                        item.count > 0
+                          ? "bg-gradient-to-t from-primary/80 to-primary group-hover:from-destructive/80 group-hover:to-destructive"
+                          : "bg-muted/60"
+                      }`}
+                      title={`${item.day} (${item.date || ""}): ${item.count} incidents`}
                     />
                   </div>
                   <span className="text-[11px] font-semibold text-muted-foreground">
-                    {daysOfWeek[idx]}
+                    {item.day}
                   </span>
                 </div>
               );
@@ -281,7 +301,7 @@ export default function OverviewDashboardPage() {
               </div>
             </div>
             <Badge variant="outline" className="text-[10px] font-mono font-bold">
-              114 Total
+              {totalAllTimeCount} Total
             </Badge>
           </div>
 
@@ -307,6 +327,7 @@ export default function OverviewDashboardPage() {
           </div>
         </Card>
       </div>
+
 
       {/* ─── 4. Dual-Panel Overview (Alerts & Reports) ──────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

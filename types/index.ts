@@ -175,11 +175,28 @@ export interface Report {
   updatedAt?: string;
 }
 
+export interface WeeklyVolumeDay {
+  day: string;
+  date?: string;
+  count: number;
+  alerts?: number;
+  reports?: number;
+}
+
+export interface CategoryDistributionItem {
+  label: string;
+  count: number;
+  percentage: string;
+  color: string;
+}
+
 export interface DashboardStats {
   active_alerts?: number;
   pending_reports?: number;
   resolved_today?: number;
   total_all_time?: number;
+  weekly_volume?: WeeklyVolumeDay[];
+  category_distribution?: CategoryDistributionItem[];
   active?: number;
   pending?: number;
   acknowledged?: number;
@@ -191,6 +208,7 @@ export interface DashboardStats {
   safe_chat_reports_count?: number;
   dispatch_units_available?: number;
 }
+
 
 export interface LiveLocationUpdate {
   alert_id: number | string;
