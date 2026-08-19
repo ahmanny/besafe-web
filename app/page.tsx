@@ -86,8 +86,8 @@ export default function LandingPage() {
             <a href="#perspectives" className="hover:text-white transition-colors">
               Citizen vs Agency
             </a>
-            <a href="#pwa-install" className="hover:text-white transition-colors">
-              Install App
+            <a href="#download" className="hover:text-white transition-colors">
+              Mobile App
             </a>
             <a href="#faq" className="hover:text-white transition-colors">
               FAQ
@@ -102,13 +102,13 @@ export default function LandingPage() {
               <Building2 className="w-4 h-4 text-[#8B93FF]" />
               <span className="hidden sm:inline">Agency</span> Portal
             </Link>
-            <Link
-              href="#pwa-install"
+            <a
+              href="#download"
               className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#353FAB] to-[#4E59D4] hover:from-[#2B3394] hover:to-[#353FAB] text-white text-xs font-bold shadow-lg shadow-[#353FAB]/30 transition-all flex items-center gap-1.5"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>Get App</span>
-            </Link>
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Get Mobile App</span>
+            </a>
           </div>
         </div>
       </header>
@@ -143,26 +143,27 @@ export default function LandingPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-3">
-                <Link
-                  href="/login"
+                <a
+                  href="#download"
                   className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#353FAB] to-[#4E59D4] hover:opacity-95 text-white font-bold shadow-xl shadow-[#353FAB]/30 flex items-center justify-center gap-2 transition-all text-sm"
                 >
-                  <Radio className="w-4 h-4 text-emerald-300 animate-pulse" />
-                  <span>Enter Agency Portal</span>
+                  <Smartphone className="w-4 h-4" />
+                  <span>Download Mobile App</span>
                   <ArrowRight className="w-4 h-4 ml-1" />
-                </Link>
+                </a>
 
-                <a
-                  href="#pwa-install"
+                <Link
+                  href="/login"
                   className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold flex items-center justify-center gap-2 transition-all text-sm border border-slate-700/80"
                 >
-                  <Smartphone className="w-4 h-4 text-[#8B93FF]" />
-                  <span>Install Web App (PWA)</span>
-                </a>
+                  <Building2 className="w-4 h-4 text-[#8B93FF]" />
+                  <span>Agency Command Portal</span>
+                </Link>
               </div>
 
               {/* Real-time Metrics Pill */}
               <div className="pt-6 grid grid-cols-3 gap-6 max-w-lg mx-auto lg:mx-0 border-t border-slate-800/80 text-left">
+
                 <div>
                   <div className="text-2xl font-extrabold text-white font-mono">&lt; 3.0s</div>
                   <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
@@ -428,70 +429,84 @@ export default function LandingPage() {
       </section>
 
 
-      {/* ─── PWA & Progressive Installation Showcase ──────────────────── */}
-      <section id="pwa-install" className="py-24 border-b border-slate-800/60 relative">
+      {/* ─── Official Mobile App Showcase (Google Play & App Store) ───── */}
+      <section id="download" className="py-24 border-b border-slate-800/60 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl bg-gradient-to-br from-slate-900 via-[#0F172A] to-[#141B2D] border border-slate-700/80 p-8 sm:p-12 shadow-2xl relative overflow-hidden">
             <div className="grid lg:grid-cols-12 gap-10 items-center">
               <div className="lg:col-span-7 space-y-6">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-bold">
-                  ⚡ INSTANT PROGRESSIVE WEB APP
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-[#8B93FF] text-xs font-mono font-bold">
+                  📱 OFFICIAL MOBILE APPLICATION
                 </div>
 
                 <h3 className="text-3xl sm:text-4xl font-extrabold text-white">
-                  Install BeSafe on Any Device in Seconds
+                  Download BeSafe for Android & iOS
                 </h3>
 
                 <p className="text-sm text-slate-300 leading-relaxed">
-                  No app store delays or heavy downloads required. Install BeSafe directly to your phone&apos;s home screen or desktop taskbar for instant, standalone emergency readiness.
+                  Protect yourself and your loved ones everywhere you go. The BeSafe mobile application runs lightweight continuous voice threat recognition, offline SMS broadcast, and direct proximity routing to emergency units.
                 </p>
 
-                <div className="grid sm:grid-cols-3 gap-4 pt-2">
-                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
-                    <span className="text-xs font-bold text-white">📱 Android / Chrome</span>
-                    <p className="text-[11px] text-slate-400">One-tap direct PWA install with background notification sync.</p>
+                {/* Mobile App Download Cards */}
+                <div className="grid sm:grid-cols-2 gap-4 pt-2">
+                  {/* Google Play */}
+                  <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-emerald-500/40 transition-all space-y-2 group cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">🤖</span>
+                        <div className="text-left">
+                          <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">GET IT ON</span>
+                          <span className="text-sm font-extrabold text-white group-hover:text-emerald-400 transition-colors">Google Play</span>
+                        </div>
+                      </div>
+                      <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[9px] font-mono">
+                        OFFICIAL
+                      </Badge>
+                    </div>
+                    <p className="text-[11px] text-slate-400">Standard Android release for all smartphone brands.</p>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
-                    <span className="text-xs font-bold text-white">🍏 iOS Safari</span>
-                    <p className="text-[11px] text-slate-400">Tap Share &rarr; &quot;Add to Home Screen&quot; for full-screen native feel.</p>
-                  </div>
-                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
-                    <span className="text-xs font-bold text-white">💻 Desktop</span>
-                    <p className="text-[11px] text-slate-400">Standalone windowed experience for command room operators.</p>
-                  </div>
-                </div>
 
-                <div className="pt-2">
-                  <Button
-                    size="lg"
-                    onClick={() => {
-                      const event = new CustomEvent("open-pwa-install");
-                      window.dispatchEvent(event);
-                    }}
-                    className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#353FAB] to-[#4E59D4] text-white font-bold text-sm shadow-xl shadow-[#353FAB]/40 flex items-center gap-2"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>Install BeSafe Web App</span>
-                  </Button>
+                  {/* Apple App Store */}
+                  <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 hover:border-[#353FAB]/40 transition-all space-y-2 group cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">🍏</span>
+                        <div className="text-left">
+                          <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">DOWNLOAD ON</span>
+                          <span className="text-sm font-extrabold text-white group-hover:text-[#8B93FF] transition-colors">App Store</span>
+                        </div>
+                      </div>
+                      <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30 text-[9px] font-mono">
+                        IOS RELEASE
+                      </Badge>
+                    </div>
+                    <p className="text-[11px] text-slate-400">Native iOS build with Siri shortcut & lock screen widget.</p>
+                  </div>
                 </div>
               </div>
 
+
+              {/* Phone Mockup Showcase */}
               <div className="lg:col-span-5 flex justify-center">
                 <div className="w-64 sm:w-72 p-4 rounded-3xl bg-slate-950 border-4 border-slate-800 shadow-2xl space-y-3">
                   <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto" />
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#353FAB] to-[#4E59D4] text-white text-center space-y-2">
-                    <Shield className="w-10 h-10 mx-auto" />
-                    <h5 className="font-extrabold text-sm">BeSafe PWA</h5>
-                    <p className="text-[10px] text-slate-200">Standalone Emergency Shell</p>
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#353FAB] to-[#4E59D4] text-white text-center space-y-2 shadow-lg shadow-[#353FAB]/30">
+                    <Shield className="w-10 h-10 mx-auto text-white" />
+                    <h5 className="font-extrabold text-sm">BeSafe Mobile</h5>
+                    <p className="text-[10px] text-slate-200">Native Citizen Defense App</p>
                   </div>
                   <div className="space-y-2 text-[11px] font-mono text-slate-300">
                     <div className="flex justify-between p-2 rounded bg-slate-900">
-                      <span>Status:</span>
-                      <span className="text-emerald-400 font-bold">ONLINE</span>
+                      <span>AI Threat Listener:</span>
+                      <span className="text-emerald-400 font-bold">ACTIVE (24/7)</span>
                     </div>
                     <div className="flex justify-between p-2 rounded bg-slate-900">
-                      <span>Telemetry:</span>
-                      <span className="text-primary font-bold">CONNECTED</span>
+                      <span>Proximity GPS:</span>
+                      <span className="text-primary font-bold">LOCKED</span>
+                    </div>
+                    <div className="flex justify-between p-2 rounded bg-slate-900">
+                      <span>Emergency Circle:</span>
+                      <span className="text-emerald-400 font-bold">SYNCED</span>
                     </div>
                   </div>
                 </div>
@@ -500,6 +515,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
 
       {/* ─── Frequently Asked Questions ───────────────────────────────── */}
       <section id="faq" className="py-24 border-b border-slate-800/60 bg-[#070B14]">
