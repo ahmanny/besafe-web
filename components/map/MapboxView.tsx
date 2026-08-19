@@ -131,16 +131,17 @@ export default function MapboxView({
     inner.style.boxShadow = "0 8px 20px rgba(53, 63, 171, 0.6)";
     inner.style.fontSize = "18px";
     inner.innerHTML = "🏛️";
-    inner.title = agencyLocation.name || "Station Headquarters";
+    inner.title = agencyLocation.name || "Agency Headquarters";
 
     wrapper.appendChild(inner);
 
     const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
       <div style="color: #0F172A; padding: 6px 10px; font-family: sans-serif;">
-        <div style="font-weight: 800; font-size: 13px; color: #1E293B;">${agencyLocation.name || "Station HQ"}</div>
-        <div style="font-size: 11px; color: #64748B; margin-top: 2px;">Station Command Headquarters & Dispatch</div>
+        <div style="font-weight: 800; font-size: 13px; color: #1E293B;">${agencyLocation.name || "Agency HQ"}</div>
+        <div style="font-size: 11px; color: #64748B; margin-top: 2px;">Agency Command Headquarters & Dispatch</div>
       </div>
     `);
+
 
     agencyMarkerRef.current = new mapboxgl.Marker({ element: wrapper })
       .setLngLat([lng, lat])

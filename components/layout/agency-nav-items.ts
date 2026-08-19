@@ -52,7 +52,7 @@ export const navItems: NavItem[] = [
     badgeKey: "reports",
   },
   {
-    label: "Station Team",
+    label: "Agency Team",
     href: "/dashboard/team",
     icon: Users,
     requiredRoles: ["SUPER_ADMIN", "AGENCY_ADMIN"],
@@ -81,7 +81,7 @@ export const navGroups: NavGroup[] = [
     items: ["/dashboard/reports"],
   },
   {
-    title: "Station Administration",
+    title: "Agency Administration",
     items: ["/dashboard/team", "/dashboard/settings"],
     requiredRoles: ["SUPER_ADMIN", "AGENCY_ADMIN"],
   },
@@ -94,15 +94,16 @@ export const navGroups: NavGroup[] = [
 
 export const settingsNavItems: NavItem[] = [
   {
-    label: "Station Profile",
+    label: "Agency Profile",
     href: "/dashboard/settings",
     icon: SlidersHorizontal,
   },
   {
-    label: "Station Geolocation",
+    label: "Agency Geolocation",
     href: "/dashboard/settings/location",
     icon: MapPin,
   },
+
   {
     label: "Access Passcode",
     href: "/dashboard/settings/security",

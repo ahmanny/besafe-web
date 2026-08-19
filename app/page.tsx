@@ -40,8 +40,8 @@ export default function LandingPage() {
       a: "BeSafe uses low-power on-device voice processing and an advanced natural language processing (NLP) model to identify acute distress phrases and emergency sounds. When a threat is verified, an encrypted SOS package is instantly transmitted with zero manual input required.",
     },
     {
-      q: "How does proximity-based station routing work?",
-      a: "When an SOS is triggered, BeSafe calculates the citizen's exact GPS coordinates and matches them with verified response headquarters within that jurisdiction, guaranteeing that the closest available emergency operators receive the distress telemetry.",
+      q: "How does proximity-based agency routing work?",
+      a: "When an SOS is triggered, BeSafe calculates the citizen's exact GPS coordinates and matches them with verified response agencies, safety units, and authorized organizations within that jurisdiction, guaranteeing that the closest available emergency operators receive the distress telemetry.",
     },
     {
       q: "Can I install BeSafe without downloading from an app store?",
@@ -49,9 +49,10 @@ export default function LandingPage() {
     },
     {
       q: "Is SafeChat reporting truly anonymous and secure?",
-      a: "All qualitative reports, evidence attachments, and witness testimonies are protected with 256-bit encryption. Citizens can choose full anonymity, and our AI pattern detection highlights escalation hazards directly to authorized law enforcement.",
+      a: "All qualitative reports, evidence attachments, and witness testimonies are protected with 256-bit encryption. Citizens can choose full anonymity, and our AI pattern detection highlights escalation hazards directly to authorized response agencies and support NGOs.",
     },
   ];
+
 
   return (
     <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col selection:bg-[#353FAB] selection:text-white font-sans antialiased overflow-x-hidden">
@@ -99,7 +100,7 @@ export default function LandingPage() {
               className="px-3.5 py-2 text-xs font-bold text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 rounded-xl hover:bg-slate-800/60"
             >
               <Building2 className="w-4 h-4 text-[#8B93FF]" />
-              <span className="hidden sm:inline">Station</span> Portal
+              <span className="hidden sm:inline">Agency</span> Portal
             </Link>
             <Link
               href="#pwa-install"
@@ -138,7 +139,7 @@ export default function LandingPage() {
               </h1>
 
               <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                BeSafe safeguards citizens 24/7 with continuous voice threat recognition, one-touch discreet SOS beacons, and encrypted SafeChat intelligence linked directly to verified law enforcement command centers.
+                BeSafe safeguards citizens 24/7 with continuous voice threat recognition, one-touch discreet SOS beacons, and encrypted SafeChat intelligence linked directly to verified response agencies and support organizations.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-3">
@@ -147,7 +148,7 @@ export default function LandingPage() {
                   className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#353FAB] to-[#4E59D4] hover:opacity-95 text-white font-bold shadow-xl shadow-[#353FAB]/30 flex items-center justify-center gap-2 transition-all text-sm"
                 >
                   <Radio className="w-4 h-4 text-emerald-300 animate-pulse" />
-                  <span>Enter Command Portal</span>
+                  <span>Enter Agency Portal</span>
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </Link>
 
@@ -165,7 +166,7 @@ export default function LandingPage() {
                 <div>
                   <div className="text-2xl font-extrabold text-white font-mono">&lt; 3.0s</div>
                   <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
-                    Station Latency
+                    Response Latency
                   </div>
                 </div>
                 <div>
@@ -177,7 +178,7 @@ export default function LandingPage() {
                 <div>
                   <div className="text-2xl font-extrabold text-emerald-400 font-mono">100%</div>
                   <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
-                    Proximity Routing
+                    Agency Routing
                   </div>
                 </div>
               </div>
@@ -217,12 +218,13 @@ export default function LandingPage() {
                     </span>
                   </div>
 
-                  {/* Assigned Station HQ */}
+                  {/* Assigned Agency HQ */}
                   <div className="absolute top-3 left-3 bg-[#353FAB]/90 px-2.5 py-1 rounded-lg border border-white/20 text-[10px] font-bold text-white flex items-center gap-1.5 shadow-md">
                     <span>🏛️</span>
-                    <span>FutMinna Police HQ (1.2 km)</span>
+                    <span>FutMinna Police Agency (1.2 km)</span>
                   </div>
                 </div>
+
 
                 {/* AI Threat Classification Box */}
                 <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
@@ -310,9 +312,9 @@ export default function LandingPage() {
               <div className="w-12 h-12 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold border border-emerald-500/20 group-hover:scale-110 transition-transform">
                 <Users className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-white">Multi-Role Station Dispatch</h3>
+              <h3 className="text-base font-bold text-white">Multi-Role Agency Dispatch</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Discrete role segregation between Station Admins and frontline Operators with live WebSocket assignment queues.
+                Discrete role segregation between Agency Admins and frontline Operators with live WebSocket assignment queues.
               </p>
             </div>
           </div>
@@ -327,7 +329,7 @@ export default function LandingPage() {
               Tailored Experiences
             </h2>
             <h3 className="text-3xl font-extrabold text-white">
-              Built for Citizens. Optimized for Responders.
+              Built for Citizens. Optimized for Response Agencies & Support NGOs.
             </h3>
             
             {/* Toggle Switch */}
@@ -352,7 +354,7 @@ export default function LandingPage() {
                     : "text-slate-400 hover:text-white"
                 }`}
               >
-                For Response Stations & Admins
+                For Response Agencies, NGOs & Admins
               </button>
             </div>
           </div>
@@ -397,7 +399,7 @@ export default function LandingPage() {
                 </div>
                 <h4 className="text-sm font-bold text-white">Live Vector Radar</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Full-screen interactive Mapbox telemetry canvas showing live distress vectors, active markers, and station headquarters.
+                  Full-screen interactive Mapbox telemetry canvas showing live distress vectors, active markers, and agency headquarters.
                 </p>
               </div>
 
@@ -417,13 +419,14 @@ export default function LandingPage() {
                 </div>
                 <h4 className="text-sm font-bold text-white">Staff Assignment Queue</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Assign incidents to specific station dispatchers with instant WebSocket sync across all connected command consoles.
+                  Assign incidents to specific agency dispatchers with instant WebSocket sync across all connected command consoles.
                 </p>
               </div>
             </div>
           )}
         </div>
       </section>
+
 
       {/* ─── PWA & Progressive Installation Showcase ──────────────────── */}
       <section id="pwa-install" className="py-24 border-b border-slate-800/60 relative">
