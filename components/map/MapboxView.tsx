@@ -116,20 +116,24 @@ export default function MapboxView({
       agencyMarkerRef.current.remove();
     }
 
-    const hqEl = document.createElement("div");
-    hqEl.className = "flex items-center justify-center cursor-pointer select-none transition-transform hover:scale-110";
-    hqEl.style.width = "40px";
-    hqEl.style.height = "40px";
-    hqEl.style.borderRadius = "14px";
-    hqEl.style.backgroundColor = "#353FAB";
-    hqEl.style.border = "2.5px solid #FFFFFF";
-    hqEl.style.boxShadow = "0 8px 20px rgba(53, 63, 171, 0.6)";
-    hqEl.style.display = "flex";
-    hqEl.style.alignItems = "center";
-    hqEl.style.justifyContent = "center";
-    hqEl.style.fontSize = "20px";
-    hqEl.innerHTML = "🏛️";
-    hqEl.title = agencyLocation.name || "Station Headquarters";
+    // Outer wrapper (holds Mapbox position)
+    const wrapper = document.createElement("div");
+    wrapper.className = "cursor-pointer select-none";
+
+    // Inner container (handles all styles and hover animations safely)
+    const inner = document.createElement("div");
+    inner.className = "transition-all duration-200 hover:scale-110 flex items-center justify-center";
+    inner.style.width = "38px";
+    inner.style.height = "38px";
+    inner.style.borderRadius = "12px";
+    inner.style.backgroundColor = "#353FAB";
+    inner.style.border = "2.5px solid #FFFFFF";
+    inner.style.boxShadow = "0 8px 20px rgba(53, 63, 171, 0.6)";
+    inner.style.fontSize = "18px";
+    inner.innerHTML = "🏛️";
+    inner.title = agencyLocation.name || "Station Headquarters";
+
+    wrapper.appendChild(inner);
 
     const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
       <div style="color: #0F172A; padding: 6px 10px; font-family: sans-serif;">
@@ -138,13 +142,13 @@ export default function MapboxView({
       </div>
     `);
 
-    agencyMarkerRef.current = new mapboxgl.Marker({ element: hqEl })
+    agencyMarkerRef.current = new mapboxgl.Marker({ element: wrapper })
       .setLngLat([lng, lat])
       .setPopup(popup)
       .addTo(map);
   }, [mapLoaded, agencyLocation]);
 
-  // 4. Render Emergency Distress Markers
+  // 4. Render Emergency Distress Markers (without transform collisions)
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
@@ -167,35 +171,37 @@ export default function MapboxView({
       const isResolved = alert.status === "resolved";
       const isAcknowledged = alert.status === "acknowledged";
 
+      const bg = isResolved
+        ? "#10B981"
+        : isAcknowledged
+        ? "#F59E0B"
+        : "#EF4444";
+
       let marker = markersRef.current[String(alert.id)];
 
       if (!marker) {
-        const el = document.createElement("div");
-        el.className = "cursor-pointer select-none transition-transform duration-200 hover:scale-125";
-        el.style.width = isSelected ? "36px" : "28px";
-        el.style.height = isSelected ? "36px" : "28px";
-        el.style.borderRadius = "50%";
-        el.style.display = "flex";
-        el.style.alignItems = "center";
-        el.style.justifyContent = "center";
-        el.style.color = "#FFFFFF";
-        el.style.fontWeight = "bold";
-        el.style.fontSize = isSelected ? "14px" : "11px";
-        el.style.border = isSelected ? "3px solid #FFFFFF" : "2px solid #FFFFFF";
+        // Outer wrapper (Mapbox controls translate position here)
+        const wrapper = document.createElement("div");
+        wrapper.className = "cursor-pointer select-none";
 
-        const bg = isResolved
-          ? "#10B981"
-          : isAcknowledged
-          ? "#F59E0B"
-          : "#EF4444";
-        el.style.backgroundColor = bg;
-        el.style.boxShadow = isSelected
-          ? `0 0 20px ${bg}, 0 0 40px ${bg}`
-          : `0 4px 12px ${bg}80`;
+        // Inner marker pin (Safe for hover, scale, and background styles)
+        const inner = document.createElement("div");
+        inner.className = "marker-pin transition-all duration-200 hover:scale-120 flex items-center justify-center font-bold";
+        inner.style.width = isSelected ? "34px" : "26px";
+        inner.style.height = isSelected ? "34px" : "26px";
+        inner.style.borderRadius = "50%";
+        inner.style.color = "#FFFFFF";
+        inner.style.fontSize = isSelected ? "13px" : "10px";
+        inner.style.border = isSelected ? "3px solid #FFFFFF" : "2px solid #FFFFFF";
+        inner.style.backgroundColor = bg;
+        inner.style.boxShadow = isSelected
+          ? `0 0 16px ${bg}, 0 0 32px ${bg}`
+          : `0 4px 10px ${bg}90`;
+        inner.innerHTML = isResolved ? "✓" : "SOS";
 
-        el.innerHTML = isResolved ? "✓" : "SOS";
+        wrapper.appendChild(inner);
 
-        el.addEventListener("click", () => {
+        wrapper.addEventListener("click", () => {
           if (onSelectAlert) onSelectAlert(alert);
         });
 
@@ -208,28 +214,26 @@ export default function MapboxView({
           </div>
         `);
 
-        marker = new mapboxgl.Marker({ element: el })
+        marker = new mapboxgl.Marker({ element: wrapper })
           .setLngLat([coords.lng, coords.lat])
           .setPopup(popup)
           .addTo(map);
 
         markersRef.current[String(alert.id)] = marker;
       } else {
-        // Update marker style on state change
-        const el = marker.getElement();
-        const bg = isResolved
-          ? "#10B981"
-          : isAcknowledged
-          ? "#F59E0B"
-          : "#EF4444";
-        el.style.width = isSelected ? "36px" : "28px";
-        el.style.height = isSelected ? "36px" : "28px";
-        el.style.fontSize = isSelected ? "14px" : "11px";
-        el.style.border = isSelected ? "3px solid #FFFFFF" : "2px solid #FFFFFF";
-        el.style.backgroundColor = bg;
-        el.style.boxShadow = isSelected
-          ? `0 0 20px ${bg}, 0 0 40px ${bg}`
-          : `0 4px 12px ${bg}80`;
+        // Update inner pin styles
+        const wrapper = marker.getElement();
+        const inner = wrapper.querySelector(".marker-pin") as HTMLElement | null;
+        if (inner) {
+          inner.style.width = isSelected ? "34px" : "26px";
+          inner.style.height = isSelected ? "34px" : "26px";
+          inner.style.fontSize = isSelected ? "13px" : "10px";
+          inner.style.border = isSelected ? "3px solid #FFFFFF" : "2px solid #FFFFFF";
+          inner.style.backgroundColor = bg;
+          inner.style.boxShadow = isSelected
+            ? `0 0 16px ${bg}, 0 0 32px ${bg}`
+            : `0 4px 10px ${bg}90`;
+        }
         marker.setLngLat([coords.lng, coords.lat]);
       }
     });
@@ -260,7 +264,6 @@ export default function MapboxView({
       }
     }
   }, [selectedAlertId, mapLoaded, alerts]);
-
 
   return (
     <div className={`relative ${className}`}>
