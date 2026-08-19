@@ -41,7 +41,9 @@ import type { Alert, Report } from "@/types";
 
 export default function OverviewDashboardPage() {
   const router = useRouter();
+  const user = useAgencyAuthStore((s) => s.user);
   const agency = useAgencyAuthStore((s) => s.agency);
+  const isDispatcher = user?.role === "DISPATCHER";
 
   // Queries from live Flask API (127.0.0.1:5000)
   const {
@@ -107,13 +109,22 @@ export default function OverviewDashboardPage() {
     { label: "Unsafe Ride Distress", count: 17, percentage: "15%", color: "bg-indigo-400" },
   ];
 
+  const headerTitle = isDispatcher
+    ? `Operator Console • ${user?.name || "Dispatcher"}`
+    : "Command Center Overview";
+
+  const headerSubtitle = isDispatcher
+    ? `Agency: ${agency?.name || user?.agency_name || "Headquarters"} • Live dispatch telemetry and incident coordination`
+    : `Agency: ${agency?.name || "Headquarters"} • Real-time emergency telemetry, active distress alerts, and SafeChat citizen reports`;
+
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-200">
       {/* ─── 1. Page Header ────────────────────────────────────────── */}
       <AdminPageHeader
-        title="Command Center Overview"
-        subtitle="Real-time emergency telemetry, active distress alerts, and SafeChat citizen reports"
+        title={headerTitle}
+        subtitle={headerSubtitle}
         action={
+
           <div className="flex items-center gap-2.5">
             <Button
               variant="outline"

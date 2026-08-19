@@ -19,6 +19,8 @@ import {
   Loader2,
   CheckCircle2,
   Radio,
+  UserCheck,
+  Building,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -106,9 +108,13 @@ function SidebarLink({
 export function AgencySidebar({ onClose }: AgencySidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const user = useAgencyAuthStore((s) => s.user);
   const agency = useAgencyAuthStore((s) => s.agency);
   const { mutate: logout, isPending: isLoggingOut } = useAgencyLogout();
   const { alerts } = useAlertStore();
+
+  const isDispatcher = user?.role === "DISPATCHER";
+  const userRole = user?.role || "AGENCY_ADMIN";
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isSettingsPath = pathname.startsWith("/dashboard/settings");
@@ -133,14 +139,18 @@ export function AgencySidebar({ onClose }: AgencySidebarProps) {
     }
   }, [showSettingsSidebar]);
 
-  const agencyName = agency?.name || "Command Center";
-  const agencyRegion = agency?.region || "Metropolitan Sector";
-  const agencyInitials = agencyName
+  const displayName = isDispatcher
+    ? `Operator ${user?.name || "Dispatcher"}`
+    : user?.name || agency?.name || "Station Admin";
+
+  const agencyLabel = agency?.name || user?.agency_name || "Agency HQ";
+
+  const userInitials = (user?.name || agency?.name || "OP")
     .split(" ")
     .map((w) => w[0])
     .join("")
     .slice(0, 2)
-    .toUpperCase() || "BS";
+    .toUpperCase();
 
   return (
     <aside className="flex h-full w-64 flex-col bg-card/95 backdrop-blur-xl border-r border-border select-none text-foreground">
@@ -156,12 +166,12 @@ export function AgencySidebar({ onClose }: AgencySidebarProps) {
                 BeSafe
               </span>
               <span className="rounded-md border border-primary/30 bg-primary/15 px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-wider text-primary">
-                Command
+                {isDispatcher ? "Dispatch" : "Command"}
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground truncate">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
-              <span className="truncate">Grid Active</span>
+              <span className="truncate">{agencyLabel}</span>
             </div>
           </div>
         </div>
@@ -199,12 +209,14 @@ export function AgencySidebar({ onClose }: AgencySidebarProps) {
           <div className="w-1/2 px-3 space-y-5">
             {navGroups
               .filter((group) => {
+                // If user is a dispatcher, hide station administration completely
+                if (isDispatcher && group.title.includes("ADMINISTRATION")) {
+                  return false;
+                }
                 if (!group.requiredRoles) return true;
-                const userRole = agency?.role || "AGENCY_ADMIN";
                 return group.requiredRoles.includes(userRole);
               })
               .map((group) => {
-                const userRole = agency?.role || "AGENCY_ADMIN";
                 const groupItems = navItems.filter((item) => {
                   if (!group.items.includes(item.href)) return false;
                   if (!item.requiredRoles) return true;
@@ -254,11 +266,11 @@ export function AgencySidebar({ onClose }: AgencySidebarProps) {
                       })}
                     </div>
                   </div>
-              );
-            })}
+                );
+              })}
           </div>
 
-          {/* ════ Pane 2: System Settings Sub-Menu ════ */}
+          {/* ════ Pane 2: System Settings Sub-Menu (Admins Only) ════ */}
           <div className="w-1/2 px-3 space-y-4">
             {/* Header / Back */}
             <div className="pb-2 border-b border-border/50">
@@ -268,7 +280,7 @@ export function AgencySidebar({ onClose }: AgencySidebarProps) {
                 className="group flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-semibold text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-4 w-4 text-primary transition-transform group-hover:-translate-x-0.5" />
-                <span className="text-foreground font-bold">System Settings</span>
+                <span className="text-foreground font-bold">Station Settings</span>
               </button>
             </div>
 
@@ -292,26 +304,33 @@ export function AgencySidebar({ onClose }: AgencySidebarProps) {
         </div>
       </div>
 
-      {/* ─── 4. Bottom Agency Profile & Logout Dropdown ────────────── */}
+      {/* ─── 4. Bottom User / Operator Profile & Dropdown ──────────── */}
       <div className="border-t border-border/70 p-3 bg-secondary/10">
         <DropdownMenu>
           <DropdownMenuTrigger className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl p-1.5 transition-colors hover:bg-secondary/40">
             <div className="flex min-w-0 items-center gap-2.5">
               <Avatar size="sm">
                 <AvatarFallback className="bg-primary/20 text-primary border border-primary/30 text-[11px] font-bold">
-                  {agencyInitials}
+                  {userInitials}
                 </AvatarFallback>
               </Avatar>
               <div className="flex min-w-0 flex-col text-left">
                 <span className="truncate text-xs font-semibold text-foreground max-w-[130px]">
-                  {agencyName}
+                  {displayName}
                 </span>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="truncate text-[9px] uppercase tracking-wider text-muted-foreground font-medium max-w-[80px]">
-                    {agencyRegion}
+                  <span className="truncate text-[9px] text-muted-foreground font-medium max-w-[90px]">
+                    Agency: {agencyLabel}
                   </span>
-                  <span className="text-[8px] font-bold uppercase px-1 py-0.2 rounded bg-primary/15 text-primary border border-primary/20">
-                    {(agency?.role || "AGENCY_ADMIN").replace("_", " ")}
+                  <span
+                    className={cn(
+                      "text-[8px] font-bold uppercase px-1 py-0.2 rounded border",
+                      isDispatcher
+                        ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                        : "bg-primary/15 text-primary border-primary/20"
+                    )}
+                  >
+                    {userRole.replace("_", " ")}
                   </span>
                 </div>
               </div>
@@ -323,13 +342,16 @@ export function AgencySidebar({ onClose }: AgencySidebarProps) {
             {/* Header info */}
             <div className="px-3 py-2 border-b border-border/50 space-y-0.5">
               <p className="truncate text-xs font-bold text-foreground">
-                {agencyName}
+                {displayName}
               </p>
               <p className="truncate text-[11px] text-muted-foreground">
-                {agency?.email || "dispatch@agency.gov"}
+                {user?.email || "operator@agency.gov"}
               </p>
-              <span className="inline-block text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-secondary text-foreground">
-                Role: {(agency?.role || "AGENCY_ADMIN").replace("_", " ")}
+              <p className="truncate text-[10px] text-primary/80 font-medium">
+                Agency: {agencyLabel}
+              </p>
+              <span className="inline-block text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-secondary text-foreground mt-1">
+                Role: {userRole.replace("_", " ")}
               </span>
             </div>
 
@@ -339,10 +361,12 @@ export function AgencySidebar({ onClose }: AgencySidebarProps) {
                 <span>Command Overview</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
-                <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>Station Settings</span>
-              </DropdownMenuItem>
+              {!isDispatcher && (
+                <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
+                  <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>Station Settings</span>
+                </DropdownMenuItem>
+              )}
             </div>
 
             <DropdownMenuSeparator />
@@ -356,12 +380,12 @@ export function AgencySidebar({ onClose }: AgencySidebarProps) {
               {isLoggingOut ? (
                 <>
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  <span>Signing out station...</span>
+                  <span>Signing out...</span>
                 </>
               ) : (
                 <>
                   <LogOut className="h-3.5 w-3.5" />
-                  <span>Sign Out Station</span>
+                  <span>Sign Out Console</span>
                 </>
               )}
             </DropdownMenuItem>

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import type { AgencyProfile } from "@/types/auth"
 
 export function useAgencyGetMe(options = {}) {
+  const setUser = useAgencyAuthStore((s) => s.setUser)
   const setAgency = useAgencyAuthStore((s) => s.setAgency)
   const clearAuth = useAgencyAuthStore((s) => s.clearAuth)
 
@@ -18,7 +19,12 @@ export function useAgencyGetMe(options = {}) {
         if (!profile) {
           throw new Error("No agency data found in response")
         }
-        setAgency(profile)
+        setUser(profile)
+        if (profile.agency) {
+          setAgency(profile.agency)
+        } else if (profile.role === "AGENCY_ADMIN" || profile.role === "SUPER_ADMIN") {
+          setAgency(profile)
+        }
         return profile
       } catch (error: any) {
         if (error.response?.status === 401) {
@@ -53,16 +59,14 @@ export function useAgencyLogin() {
     },
     onSuccess: (data) => {
       const token = data.token
-      const agencyProfile: AgencyProfile = {
-        id: String(data.agency?.id || data.user?.id || ""),
-        name: data.agency?.name || data.user?.name || "Safety Agency",
-        email: data.agency?.email || data.user?.email || "",
-        phone_number: data.agency?.phone_number || data.user?.phone_number || "",
-        region: data.agency?.region || data.user?.region || "",
-        role: data.agency?.role || data.user?.role || "AGENCY_ADMIN",
-        location: data.agency?.location || data.user?.location,
-        coverage_radius_km: data.agency?.coverage_radius_km || 25,
-        is_verified: true,
+      const operatorProfile: AgencyProfile = {
+        id: String(data.user?.id || data.agency?.id || ""),
+        name: data.user?.name || data.agency?.name || "Operator",
+        email: data.user?.email || data.agency?.email || "",
+        phone_number: data.user?.phone_number || data.agency?.phone_number || "",
+        role: data.user?.role || data.agency?.role || "DISPATCHER",
+        agency_id: data.user?.agency_id || data.agency?.id,
+        agency: data.agency,
       }
 
       setCookie(null, "agencyAccessToken", token, {
@@ -83,10 +87,10 @@ export function useAgencyLogin() {
 
       if (typeof window !== "undefined") {
         localStorage.setItem("besafe_agency_token", token)
-        localStorage.setItem("besafe_agency_profile", JSON.stringify(agencyProfile))
+        localStorage.setItem("besafe_agency_profile", JSON.stringify(operatorProfile))
       }
 
-      setAuth(token, agencyProfile)
+      setAuth(token, operatorProfile, data.agency)
       queryClient.invalidateQueries({ queryKey: ["agency", "me"] })
     },
   })
@@ -136,4 +140,3 @@ export function useAgencyLogout() {
     },
   })
 }
-

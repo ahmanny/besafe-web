@@ -19,6 +19,7 @@ export interface AgencyProfile {
   role: AgencyRole;
   agency_id?: string;
   agency_name?: string;
+  agency?: AgencyProfile;
   location?: AgencyLocation;
   latitude?: number;
   longitude?: number;
@@ -27,6 +28,7 @@ export interface AgencyProfile {
   must_change_password?: boolean;
   created_at?: string;
 }
+
 
 export interface StaffMember {
   id: string;

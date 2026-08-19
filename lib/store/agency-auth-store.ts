@@ -3,45 +3,72 @@ import { persist } from "zustand/middleware"
 import type { AgencyProfile, AgencyRole } from "@/types/auth"
 
 interface AgencyAuthStore {
+  user: AgencyProfile | null
   agency: AgencyProfile | null
   token: string | null
   isAuthenticated: boolean
-  setAuth: (token: string, agency: AgencyProfile) => void
+  setAuth: (token: string, profile: AgencyProfile, agency?: AgencyProfile | null) => void
   setAgency: (agency: AgencyProfile) => void
+  setUser: (user: AgencyProfile) => void
   clearAuth: () => void
   isRole: (role: AgencyRole) => boolean
   hasAnyRole: (roles: AgencyRole[]) => boolean
+  isAgencyAdmin: () => boolean
+  isDispatcher: () => boolean
 }
 
 export const useAgencyAuthStore = create<AgencyAuthStore>()(
   persist(
     (set, get) => ({
+      user: null,
       agency: null,
       token: null,
       isAuthenticated: false,
 
-      setAuth: (token, agency) => {
-        set({ token, agency, isAuthenticated: true })
+      setAuth: (token, profile, explicitAgency) => {
+        const agencyContext = explicitAgency || profile.agency || (profile.role === "AGENCY_ADMIN" ? profile : null)
+        set({
+          token,
+          user: profile,
+          agency: agencyContext,
+          isAuthenticated: true,
+        })
       },
 
       setAgency: (agency) => {
         set({ agency })
       },
 
+      setUser: (user) => {
+        set({ user })
+      },
+
       clearAuth: () => {
-        set({ agency: null, token: null, isAuthenticated: false })
+        set({ user: null, agency: null, token: null, isAuthenticated: false })
       },
 
       isRole: (role) => {
-        const agency = get().agency
-        if (!agency) return false
-        return agency.role === role
+        const user = get().user
+        if (!user) return false
+        return user.role === role
       },
 
       hasAnyRole: (roles) => {
-        const agency = get().agency
-        if (!agency) return false
-        return roles.includes(agency.role)
+        const user = get().user
+        if (!user) return false
+        return roles.includes(user.role)
+      },
+
+      isAgencyAdmin: () => {
+        const user = get().user
+        if (!user) return false
+        return user.role === "AGENCY_ADMIN" || user.role === "SUPER_ADMIN"
+      },
+
+      isDispatcher: () => {
+        const user = get().user
+        if (!user) return false
+        return user.role === "DISPATCHER"
       },
     }),
     {
