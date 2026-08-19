@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState } from "react"
+import Link from "next/link";
+import { useState } from "react";
 import {
   Shield,
   Radio,
@@ -17,326 +17,407 @@ import {
   Smartphone,
   ChevronRight,
   Sparkles,
-} from "lucide-react"
+  Zap,
+  Activity,
+  Cpu,
+  Layers,
+  HelpCircle,
+  ChevronDown,
+  ShieldAlert,
+  Users,
+  Compass,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function LandingPage() {
-  const [activeTab, setActiveTab] = useState<"citizens" | "agencies">("citizens")
+  const [activePerspective, setActivePerspective] = useState<"citizens" | "agencies">("citizens");
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  const faqs = [
+    {
+      q: "How does BeSafe detect threats in the background?",
+      a: "BeSafe uses low-power on-device voice processing and an advanced natural language processing (NLP) model to identify acute distress phrases and emergency sounds. When a threat is verified, an encrypted SOS package is instantly transmitted with zero manual input required.",
+    },
+    {
+      q: "How does proximity-based station routing work?",
+      a: "When an SOS is triggered, BeSafe calculates the citizen's exact GPS coordinates and matches them with verified response headquarters within that jurisdiction, guaranteeing that the closest available emergency operators receive the distress telemetry.",
+    },
+    {
+      q: "Can I install BeSafe without downloading from an app store?",
+      a: "Yes! BeSafe is a full Progressive Web App (PWA). You can install it directly onto your iPhone, Android, or desktop browser by tapping 'Install' or 'Add to Home Screen' for instant full-screen offline access.",
+    },
+    {
+      q: "Is SafeChat reporting truly anonymous and secure?",
+      a: "All qualitative reports, evidence attachments, and witness testimonies are protected with 256-bit encryption. Citizens can choose full anonymity, and our AI pattern detection highlights escalation hazards directly to authorized law enforcement.",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col selection:bg-[var(--primary)] selection:text-white">
+    <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col selection:bg-[#353FAB] selection:text-white font-sans antialiased overflow-x-hidden">
       {/* ─── Top Navigation Bar ────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-[var(--bg-base)]/85 border-b border-[var(--border-subtle)]">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#070B14]/80 border-b border-slate-800/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#353FAB] to-[#4E59D4] flex items-center justify-center shadow-lg shadow-[var(--primary-glow)]">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#353FAB] to-[#4E59D4] flex items-center justify-center shadow-lg shadow-[#353FAB]/30 border border-[#8B93FF]/30">
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold tracking-tight text-white flex items-center gap-1.5">
-                BeSafe <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--primary)]/20 text-[#8B93FF] border border-[var(--primary)]/40 font-medium">v1.0</span>
+              <span className="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+                BeSafe
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#353FAB]/20 text-[#8B93FF] border border-[#353FAB]/40 font-mono font-bold">
+                  COMMAND v2.0
+                </span>
               </span>
-              <span className="text-[11px] text-[var(--text-muted)] -mt-1 font-medium tracking-wider uppercase">Emergency Network</span>
+              <span className="text-[10px] text-slate-400 font-medium tracking-wider uppercase">
+                Tactical Emergency Network
+              </span>
             </div>
           </div>
 
-          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-[var(--text-secondary)]">
-            <a href="#features" className="hover:text-white transition-colors">Safety Features</a>
-            <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
-            <a href="#safe-chat" className="hover:text-white transition-colors">Safe Chat</a>
-            <a href="#agencies" className="hover:text-white transition-colors">For Agencies</a>
+          <nav className="hidden lg:flex items-center space-x-8 text-xs font-semibold uppercase tracking-wider text-slate-300">
+            <a href="#features" className="hover:text-white transition-colors">
+              Capabilities
+            </a>
+            <a href="#how-it-works" className="hover:text-white transition-colors">
+              Telemetry Flow
+            </a>
+            <a href="#perspectives" className="hover:text-white transition-colors">
+              Citizen vs Agency
+            </a>
+            <a href="#pwa-install" className="hover:text-white transition-colors">
+              Install App
+            </a>
+            <a href="#faq" className="hover:text-white transition-colors">
+              FAQ
+            </a>
           </nav>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <Link
               href="/login"
-              className="px-4 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-white transition-colors flex items-center gap-2"
+              className="px-3.5 py-2 text-xs font-bold text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 rounded-xl hover:bg-slate-800/60"
             >
-              <Building2 className="w-4 h-4 text-[var(--primary)]" />
-              Agency Portal
+              <Building2 className="w-4 h-4 text-[#8B93FF]" />
+              <span className="hidden sm:inline">Station</span> Portal
             </Link>
             <Link
-              href="#download"
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#353FAB] to-[#4E59D4] hover:from-[#2B3394] hover:to-[#353FAB] text-white text-sm font-semibold shadow-lg shadow-[var(--primary-glow)] hover:shadow-xl hover:shadow-[var(--primary-glow)] transition-all flex items-center gap-2"
+              href="#pwa-install"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#353FAB] to-[#4E59D4] hover:from-[#2B3394] hover:to-[#353FAB] text-white text-xs font-bold shadow-lg shadow-[#353FAB]/30 transition-all flex items-center gap-1.5"
             >
-              <Download className="w-4 h-4" />
-              Get App
+              <Download className="w-3.5 h-3.5" />
+              <span>Get App</span>
             </Link>
           </div>
         </div>
       </header>
 
-      {/* ─── Hero Section ─────────────────────────────────────────────── */}
-      <section className="relative pt-16 pb-24 overflow-hidden border-b border-[var(--border-subtle)]">
-        {/* Background glow flares */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[350px] bg-gradient-to-tr from-[var(--primary)]/25 to-red-500/10 blur-[130px] pointer-events-none -z-10 rounded-full" />
+      {/* ─── Hero Section with Ambient Glow ───────────────────────────── */}
+      <section className="relative pt-16 pb-24 overflow-hidden border-b border-slate-800/60">
+        {/* Dynamic Glow Meshes */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-gradient-to-tr from-[#353FAB]/30 via-indigo-600/15 to-red-600/10 blur-[140px] pointer-events-none -z-10 rounded-full" />
+        <div className="absolute top-20 right-10 w-96 h-96 bg-blue-600/10 blur-[120px] pointer-events-none -z-10 rounded-full" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
+            {/* Left Hero Pitch */}
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-subtle)] text-xs font-semibold text-[#A5B4FC]">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs font-bold text-[#A5B4FC] shadow-inner">
                 <span className="flex h-2 w-2 relative">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                AI-Powered Emergency Detection & Proximity Dispatch
+                Live Emergency Mesh • Proximity-Routed Response
               </div>
 
-              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
+              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
                 Instant Safety When <br />
                 <span className="bg-gradient-to-r from-white via-slate-200 to-[#8B93FF] bg-clip-text text-transparent">
                   Every Second Counts.
                 </span>
               </h1>
 
-              <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                BeSafe protects you 24/7 with continuous voice threat recognition, one-touch discreet SOS alerts, and anonymous Safe Chat reporting connected directly to verified response stations.
+              <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                BeSafe safeguards citizens 24/7 with continuous voice threat recognition, one-touch discreet SOS beacons, and encrypted SafeChat intelligence linked directly to verified law enforcement command centers.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-3">
                 <Link
-                  href="#download"
-                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#353FAB] to-[#4E59D4] hover:opacity-95 text-white font-semibold shadow-lg shadow-[var(--primary-glow)] flex items-center justify-center gap-2.5 transition-all text-base"
+                  href="/login"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#353FAB] to-[#4E59D4] hover:opacity-95 text-white font-bold shadow-xl shadow-[#353FAB]/30 flex items-center justify-center gap-2 transition-all text-sm"
                 >
-                  <Smartphone className="w-5 h-5" />
-                  Download Mobile App
+                  <Radio className="w-4 h-4 text-emerald-300 animate-pulse" />
+                  <span>Enter Command Portal</span>
+                  <ArrowRight className="w-4 h-4 ml-1" />
                 </Link>
-                <Link
-                  href="/dashboard"
-                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl glass-panel glass-panel-hover text-white font-semibold flex items-center justify-center gap-2.5 transition-all text-base border border-[var(--border-subtle)]"
+
+                <a
+                  href="#pwa-install"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold flex items-center justify-center gap-2 transition-all text-sm border border-slate-700/80"
                 >
-                  <Radio className="w-5 h-5 text-[var(--emergency)]" />
-                  Agency Live Command
-                  <ArrowRight className="w-4 h-4 text-[var(--text-muted)]" />
-                </Link>
+                  <Smartphone className="w-4 h-4 text-[#8B93FF]" />
+                  <span>Install Web App (PWA)</span>
+                </a>
               </div>
 
-              <div className="pt-6 grid grid-cols-3 gap-6 max-w-lg mx-auto lg:mx-0 border-t border-[var(--border-subtle)] text-left">
+              {/* Real-time Metrics Pill */}
+              <div className="pt-6 grid grid-cols-3 gap-6 max-w-lg mx-auto lg:mx-0 border-t border-slate-800/80 text-left">
                 <div>
-                  <div className="text-2xl font-bold text-white">&lt; 3 sec</div>
-                  <div className="text-xs text-[var(--text-muted)]">SOS Auto-Trigger</div>
+                  <div className="text-2xl font-extrabold text-white font-mono">&lt; 3.0s</div>
+                  <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
+                    Station Latency
+                  </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-white">100%</div>
-                  <div className="text-xs text-[var(--text-muted)]">Encrypted Evidence</div>
+                  <div className="text-2xl font-extrabold text-white font-mono">256-Bit</div>
+                  <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
+                    Encrypted Evidence
+                  </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-white">Live GPS</div>
-                  <div className="text-xs text-[var(--text-muted)]">Station Routing</div>
+                  <div className="text-2xl font-extrabold text-emerald-400 font-mono">100%</div>
+                  <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
+                    Proximity Routing
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Simulated Live Alert Display Card */}
+            {/* Right Hero Interactive Simulation Card */}
             <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md rounded-2xl glass-panel p-6 shadow-2xl border border-[var(--border-subtle)]">
-                {/* Simulated Header */}
-                <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
-                  <div className="flex items-center space-x-2">
-                    <span className="flex h-3 w-3 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--emergency)]"></span>
+              <div className="relative rounded-3xl bg-[#0F172A]/90 border border-slate-700/80 shadow-2xl p-5 backdrop-blur-xl overflow-hidden space-y-4">
+                {/* Header Banner */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
+                    <span className="text-xs font-bold font-mono text-red-400 uppercase">
+                      CRITICAL ALERT • #6A380031
                     </span>
-                    <span className="text-xs font-bold uppercase tracking-wider text-[var(--emergency)]">Active SOS Stream</span>
                   </div>
-                  <span className="text-xs text-[var(--text-muted)] font-mono">ID: #SOS-9821</span>
+                  <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-[10px] font-mono">
+                    VOICE SOS TRIGGER
+                  </Badge>
                 </div>
 
-                {/* Simulated Body */}
-                <div className="py-5 space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className="text-base font-semibold text-white">Threat Voice Triggered</h4>
-                      <p className="text-xs text-[var(--text-secondary)]">Speech Keyword: &ldquo;Help me please&rdquo;</p>
+                {/* Simulated GPS Radar Snapshot */}
+                <div className="relative h-44 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[radial-gradient(#353FAB_1px,transparent_1px)] [background-size:16px_16px] opacity-20" />
+                  
+                  {/* Radar Circles */}
+                  <div className="absolute w-36 h-36 rounded-full border border-indigo-500/20 animate-ping" />
+                  <div className="absolute w-24 h-24 rounded-full border border-indigo-500/40" />
+
+                  {/* Target Beacon */}
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="w-9 h-9 rounded-full bg-red-500 border-2 border-white shadow-lg shadow-red-500/60 flex items-center justify-center font-bold text-[10px] text-white animate-pulse">
+                      SOS
                     </div>
-                    <span className="px-2.5 py-1 rounded-md bg-[var(--emergency)]/20 text-[var(--emergency)] text-xs font-bold border border-[var(--emergency)]/30">
-                      HIGH PRIORITY
+                    <span className="mt-1 text-[9px] font-mono font-bold bg-black/80 px-2 py-0.5 rounded text-slate-200 border border-slate-800">
+                      David DOE • 9.8494°, 8.8889°
                     </span>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[var(--text-muted)] flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-[var(--info)]" /> Live Location
-                      </span>
-                      <span className="text-white font-mono font-medium">15.5007° N, 32.5599° E</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[var(--text-muted)] flex items-center gap-1.5">
-                        <Building2 className="w-3.5 h-3.5 text-[var(--primary)]" /> Assigned Station
-                      </span>
-                      <span className="text-[#A5B4FC] font-medium">Central Police Division 1</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-[var(--text-muted)] pt-1">
-                    <span className="flex items-center gap-1.5">
-                      <Mic className="w-3.5 h-3.5 text-emerald-400" /> Audio Recorded: 00:24s
-                    </span>
-                    <span className="text-emerald-400 font-medium">Emergency Contacts Notified</span>
+                  {/* Assigned Station HQ */}
+                  <div className="absolute top-3 left-3 bg-[#353FAB]/90 px-2.5 py-1 rounded-lg border border-white/20 text-[10px] font-bold text-white flex items-center gap-1.5 shadow-md">
+                    <span>🏛️</span>
+                    <span>FutMinna Police HQ (1.2 km)</span>
                   </div>
                 </div>
 
-                {/* Simulated Action */}
-                <Link
-                  href="/dashboard"
-                  className="w-full py-2.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-xs font-bold text-center block transition-all shadow-md"
-                >
-                  Open Live Incident Triage →
-                </Link>
+                {/* AI Threat Classification Box */}
+                <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400 flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" /> AI Threat Score:
+                    </span>
+                    <span className="font-mono font-bold text-amber-400">0.96 (CRITICAL)</span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 italic line-clamp-2">
+                    &quot;User distress signal initiated. High-likelihood acute threat requiring priority dispatcher review.&quot;
+                  </p>
+                </div>
+
+                {/* Simulated Action Dispatch */}
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                    <span>Live GPS Telemetry Active</span>
+                  </div>
+                  <Link
+                    href="/login"
+                    className="text-xs font-bold text-[#8B93FF] hover:underline flex items-center gap-1"
+                  >
+                    View in Console <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── Core Capabilities Grid ───────────────────────────────────── */}
-      <section id="features" className="py-24 border-b border-[var(--border-subtle)]">
+      {/* ─── 4 Core Capabilities Grid ─────────────────────────────────── */}
+      <section id="features" className="py-24 border-b border-slate-800/60 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--primary-light)]">Built for Absolute Reliability</h2>
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-white">Comprehensive Safety Architecture</h3>
-            <p className="text-[var(--text-secondary)] text-base">
-              Engineered with advanced on-device intelligence, silent emergency triggers, and automatic station routing.
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <h2 className="text-xs font-bold font-mono uppercase tracking-widest text-[#8B93FF]">
+              Core Tactical Architecture
+            </h2>
+            <p className="text-3xl sm:text-4xl font-extrabold text-white">
+              End-to-End Emergency Intelligence
+            </p>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              Every layer of the BeSafe platform is engineered for zero-latency detection, fail-safe communication, and rapid dispatch.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="p-6 rounded-2xl glass-panel space-y-4 border border-[var(--border-subtle)] hover:border-[var(--border-hover)] transition-all">
-              <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-[var(--emergency)]">
+            {/* Feature 1 */}
+            <div className="p-6 rounded-2xl bg-[#0F172A]/70 border border-slate-800 hover:border-[#353FAB]/60 transition-all group shadow-lg hover:shadow-[#353FAB]/10 space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center font-bold border border-red-500/20 group-hover:scale-110 transition-transform">
                 <Mic className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-bold text-white">AI Threat Voice Detection</h4>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                Background microphone intelligence listens for distress keywords and automatically initiates a 3-second auto-dispatch countdown.
+              <h3 className="text-base font-bold text-white">Voice Threat Recognition</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Background audio pipeline processes acoustic keywords and distress cues, triggering automated alerts without touching the device.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl glass-panel space-y-4 border border-[var(--border-subtle)] hover:border-[var(--border-hover)] transition-all">
-              <div className="w-12 h-12 rounded-xl bg-[var(--primary)]/15 border border-[var(--primary)]/30 flex items-center justify-center text-[#A5B4FC]">
-                <Radio className="w-6 h-6" />
+            {/* Feature 2 */}
+            <div className="p-6 rounded-2xl bg-[#0F172A]/70 border border-slate-800 hover:border-[#353FAB]/60 transition-all group shadow-lg hover:shadow-[#353FAB]/10 space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-[#353FAB]/20 text-[#8B93FF] flex items-center justify-center font-bold border border-[#353FAB]/30 group-hover:scale-110 transition-transform">
+                <Compass className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-bold text-white">One-Touch SOS & Broadcast</h4>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                Hold-to-trigger gesture instantly sends real-time GPS coordinates to response units and sends SMS alerts to emergency contacts.
+              <h3 className="text-base font-bold text-white">Vector Radar & Proximity</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Automated Haversine and geospatial indexing routes alerts to the physically closest command post in sub-second timeframes.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl glass-panel space-y-4 border border-[var(--border-subtle)] hover:border-[var(--border-hover)] transition-all">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            {/* Feature 3 */}
+            <div className="p-6 rounded-2xl bg-[#0F172A]/70 border border-slate-800 hover:border-[#353FAB]/60 transition-all group shadow-lg hover:shadow-[#353FAB]/10 space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center font-bold border border-amber-500/20 group-hover:scale-110 transition-transform">
                 <MessageSquare className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-bold text-white">Safe Chat Reporting</h4>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                Anonymous guided questionnaires for domestic abuse or harassment with end-to-end encrypted audio and photo evidence vaulting.
+              <h3 className="text-base font-bold text-white">SafeChat Citizen Reports</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Encrypted qualitative reporting interface with AI-driven escalation dossiers, forensic timelines, and evidence vaults.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl glass-panel space-y-4 border border-[var(--border-subtle)] hover:border-[var(--border-hover)] transition-all">
-              <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-[var(--info)]">
-                <MapPin className="w-6 h-6" />
+            {/* Feature 4 */}
+            <div className="p-6 rounded-2xl bg-[#0F172A]/70 border border-slate-800 hover:border-[#353FAB]/60 transition-all group shadow-lg hover:shadow-[#353FAB]/10 space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                <Users className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-bold text-white">Proximity Dispatch Routing</h4>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                Coordinates are dynamically matched against registered agency geofences to route emergencies to the nearest responder.
+              <h3 className="text-base font-bold text-white">Multi-Role Station Dispatch</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Discrete role segregation between Station Admins and frontline Operators with live WebSocket assignment queues.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── How It Works (Citizen & Agency Switcher) ─────────────────── */}
-      <section id="how-it-works" className="py-24 border-b border-[var(--border-subtle)] bg-[var(--bg-sidebar)]/50">
+      {/* ─── Citizen Defense vs Agency Command (Interactive Tab) ───────── */}
+      <section id="perspectives" className="py-24 border-b border-slate-800/60 bg-[#0B0F19]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#8B93FF]">Workflow Coordination</h2>
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-white">How BeSafe Connects the Ecosystem</h3>
+          <div className="text-center space-y-4">
+            <h2 className="text-xs font-bold font-mono uppercase tracking-widest text-[#8B93FF]">
+              Tailored Experiences
+            </h2>
+            <h3 className="text-3xl font-extrabold text-white">
+              Built for Citizens. Optimized for Responders.
+            </h3>
             
-            {/* Tab Switcher */}
-            <div className="inline-flex p-1.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] mt-4">
+            {/* Toggle Switch */}
+            <div className="inline-flex p-1 rounded-xl bg-slate-900 border border-slate-800">
               <button
-                onClick={() => setActiveTab("citizens")}
-                className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  activeTab === "citizens"
-                    ? "bg-[var(--primary)] text-white shadow-md"
-                    : "text-[var(--text-secondary)] hover:text-white"
+                type="button"
+                onClick={() => setActivePerspective("citizens")}
+                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
+                  activePerspective === "citizens"
+                    ? "bg-[#353FAB] text-white shadow-md"
+                    : "text-slate-400 hover:text-white"
                 }`}
               >
-                For Citizens (Mobile App)
+                For Citizens & Families
               </button>
               <button
-                onClick={() => setActiveTab("agencies")}
-                className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  activeTab === "agencies"
-                    ? "bg-[var(--primary)] text-white shadow-md"
-                    : "text-[var(--text-secondary)] hover:text-white"
+                type="button"
+                onClick={() => setActivePerspective("agencies")}
+                className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
+                  activePerspective === "agencies"
+                    ? "bg-[#353FAB] text-white shadow-md"
+                    : "text-slate-400 hover:text-white"
                 }`}
               >
-                For Agencies (Command Portal)
+                For Response Stations & Admins
               </button>
             </div>
           </div>
 
-          {activeTab === "citizens" ? (
-            <div className="grid md:grid-cols-3 gap-8 pt-4">
-              <div className="p-8 rounded-2xl glass-panel space-y-4">
-                <div className="w-10 h-10 rounded-full bg-[var(--primary)]/20 text-[#A5B4FC] font-bold flex items-center justify-center text-base border border-[var(--primary)]/40">
-                  1
+          {activePerspective === "citizens" ? (
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                <div className="w-10 h-10 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center font-bold">
+                  <Zap className="w-5 h-5" />
                 </div>
-                <h4 className="text-xl font-bold text-white">Trigger SOS or Safe Chat</h4>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  Trigger SOS by speaking distress phrases, holding the emergency button, or filling out a discreet guided incident report.
+                <h4 className="text-sm font-bold text-white">Discreet Silent Trigger</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Trigger an SOS discreetly by voice phrase, lock screen widget, or emergency contact broadcast without raising suspicion.
                 </p>
               </div>
 
-              <div className="p-8 rounded-2xl glass-panel space-y-4">
-                <div className="w-10 h-10 rounded-full bg-[var(--primary)]/20 text-[#A5B4FC] font-bold flex items-center justify-center text-base border border-[var(--primary)]/40">
-                  2
+              <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                <div className="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
+                  <ShieldAlert className="w-5 h-5" />
                 </div>
-                <h4 className="text-xl font-bold text-white">Live Stream & GPS Lock</h4>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  Your device captures background coordinates and evidence, encrypts the payload, and sends alerts to family and emergency services.
+                <h4 className="text-sm font-bold text-white">Real-Time Circle Broadcast</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Automatically sends simultaneous SMS alerts with your live location coordinates to all designated family emergency contacts.
                 </p>
               </div>
 
-              <div className="p-8 rounded-2xl glass-panel space-y-4">
-                <div className="w-10 h-10 rounded-full bg-[var(--primary)]/20 text-[#A5B4FC] font-bold flex items-center justify-center text-base border border-[var(--primary)]/40">
-                  3
+              <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                  <Lock className="w-5 h-5" />
                 </div>
-                <h4 className="text-xl font-bold text-white">Immediate Assistance</h4>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  The nearest patrol or emergency team receives your exact location and dispatches help straight to you.
+                <h4 className="text-sm font-bold text-white">Zero-Trace SafeChat</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Submit confidential reports regarding harassment, abuse, or transport hazards with full evidence encryption.
                 </p>
               </div>
             </div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-8 pt-4">
-              <div className="p-8 rounded-2xl glass-panel space-y-4">
-                <div className="w-10 h-10 rounded-full bg-[var(--emergency)]/20 text-[var(--emergency)] font-bold flex items-center justify-center text-base border border-[var(--emergency)]/40">
-                  1
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/20 text-[#8B93FF] flex items-center justify-center font-bold">
+                  <Layers className="w-5 h-5" />
                 </div>
-                <h4 className="text-xl font-bold text-white">Real-Time Triage Alert</h4>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  Receive instant audible alarms and map beacons whenever an SOS or Safe Chat report occurs within your coverage radius.
+                <h4 className="text-sm font-bold text-white">Live Vector Radar</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Full-screen interactive Mapbox telemetry canvas showing live distress vectors, active markers, and station headquarters.
                 </p>
               </div>
 
-              <div className="p-8 rounded-2xl glass-panel space-y-4">
-                <div className="w-10 h-10 rounded-full bg-[var(--emergency)]/20 text-[var(--emergency)] font-bold flex items-center justify-center text-base border border-[var(--emergency)]/40">
-                  2
+              <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                  <Cpu className="w-5 h-5" />
                 </div>
-                <h4 className="text-xl font-bold text-white">Mapbox Live Tracking</h4>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  Track live moving victims on full-screen vector maps with breadcrumb trails, audio recordings, and medical contact information.
+                <h4 className="text-sm font-bold text-white">Explainable AI Dossiers</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Real-time threat pattern categorization, severity scoring, and evidence summaries generated via Gemini models.
                 </p>
               </div>
 
-              <div className="p-8 rounded-2xl glass-panel space-y-4">
-                <div className="w-10 h-10 rounded-full bg-[var(--emergency)]/20 text-[var(--emergency)] font-bold flex items-center justify-center text-base border border-[var(--emergency)]/40">
-                  3
+              <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                  <Users className="w-5 h-5" />
                 </div>
-                <h4 className="text-xl font-bold text-white">Unit Dispatch & Closure</h4>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  Assign response units, update incident statuses, log resolution notes, and generate agency performance analytics.
+                <h4 className="text-sm font-bold text-white">Staff Assignment Queue</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Assign incidents to specific station dispatchers with instant WebSocket sync across all connected command consoles.
                 </p>
               </div>
             </div>
@@ -344,90 +425,151 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Agency Sign-up Callout ────────────────────────────────────── */}
-      <section id="agencies" className="py-20 border-b border-[var(--border-subtle)]">
+      {/* ─── PWA & Progressive Installation Showcase ──────────────────── */}
+      <section id="pwa-install" className="py-24 border-b border-slate-800/60 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl p-10 lg:p-16 bg-gradient-to-r from-[var(--bg-card)] via-[#161D2C] to-[var(--bg-card)] border border-[var(--border-subtle)] relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-10">
-            <div className="space-y-4 max-w-2xl text-center lg:text-left">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#8B93FF]">Command Center Onboarding</span>
-              <h3 className="text-3xl sm:text-4xl font-extrabold text-white">Are You an Emergency Response Agency?</h3>
-              <p className="text-[var(--text-secondary)] text-base">
-                Police departments, campus safety units, private security patrols, and emergency medical teams can register for real-time dispatch dashboard access.
-              </p>
-              <ul className="grid sm:grid-cols-2 gap-3 pt-2 text-sm text-[var(--text-secondary)]">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Mapbox Vector Live Feeds
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Evidence Audio & Photo Vault
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Automated Webhook Notifications
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Geofence Radius Routing
-                </li>
-              </ul>
-            </div>
+          <div className="rounded-3xl bg-gradient-to-br from-slate-900 via-[#0F172A] to-[#141B2D] border border-slate-700/80 p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+            <div className="grid lg:grid-cols-12 gap-10 items-center">
+              <div className="lg:col-span-7 space-y-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-bold">
+                  ⚡ INSTANT PROGRESSIVE WEB APP
+                </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Link
-                href="/login"
-                className="px-8 py-4 rounded-xl bg-gradient-to-r from-[#353FAB] to-[#4E59D4] hover:opacity-95 text-white font-bold text-center shadow-lg shadow-[var(--primary-glow)] transition-all"
-              >
-                Access Agency Portal
-              </Link>
+                <h3 className="text-3xl sm:text-4xl font-extrabold text-white">
+                  Install BeSafe on Any Device in Seconds
+                </h3>
+
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  No app store delays or heavy downloads required. Install BeSafe directly to your phone&apos;s home screen or desktop taskbar for instant, standalone emergency readiness.
+                </p>
+
+                <div className="grid sm:grid-cols-3 gap-4 pt-2">
+                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
+                    <span className="text-xs font-bold text-white">📱 Android / Chrome</span>
+                    <p className="text-[11px] text-slate-400">One-tap direct PWA install with background notification sync.</p>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
+                    <span className="text-xs font-bold text-white">🍏 iOS Safari</span>
+                    <p className="text-[11px] text-slate-400">Tap Share &rarr; &quot;Add to Home Screen&quot; for full-screen native feel.</p>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
+                    <span className="text-xs font-bold text-white">💻 Desktop</span>
+                    <p className="text-[11px] text-slate-400">Standalone windowed experience for command room operators.</p>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <Button
+                    size="lg"
+                    onClick={() => {
+                      const event = new CustomEvent("open-pwa-install");
+                      window.dispatchEvent(event);
+                    }}
+                    className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#353FAB] to-[#4E59D4] text-white font-bold text-sm shadow-xl shadow-[#353FAB]/40 flex items-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Install BeSafe Web App</span>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="lg:col-span-5 flex justify-center">
+                <div className="w-64 sm:w-72 p-4 rounded-3xl bg-slate-950 border-4 border-slate-800 shadow-2xl space-y-3">
+                  <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto" />
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#353FAB] to-[#4E59D4] text-white text-center space-y-2">
+                    <Shield className="w-10 h-10 mx-auto" />
+                    <h5 className="font-extrabold text-sm">BeSafe PWA</h5>
+                    <p className="text-[10px] text-slate-200">Standalone Emergency Shell</p>
+                  </div>
+                  <div className="space-y-2 text-[11px] font-mono text-slate-300">
+                    <div className="flex justify-between p-2 rounded bg-slate-900">
+                      <span>Status:</span>
+                      <span className="text-emerald-400 font-bold">ONLINE</span>
+                    </div>
+                    <div className="flex justify-between p-2 rounded bg-slate-900">
+                      <span>Telemetry:</span>
+                      <span className="text-primary font-bold">CONNECTED</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── Download CTA Section ──────────────────────────────────────── */}
-      <section id="download" className="py-24 text-center">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          <h3 className="text-3xl sm:text-5xl font-extrabold text-white">Protect Yourself & Loved Ones Today</h3>
-          <p className="text-[var(--text-secondary)] text-base max-w-xl mx-auto">
-            Download the BeSafe mobile app for Android and iOS to activate instant voice threat detection and 24/7 emergency response.
-          </p>
+      {/* ─── Frequently Asked Questions ───────────────────────────────── */}
+      <section id="faq" className="py-24 border-b border-slate-800/60 bg-[#070B14]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="text-center space-y-3">
+            <h2 className="text-xs font-bold font-mono uppercase tracking-widest text-[#8B93FF]">
+              Frequently Asked Questions
+            </h2>
+            <h3 className="text-3xl font-extrabold text-white">
+              Questions & Security Protocols
+            </h3>
+          </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <a
-              href="#"
-              className="px-7 py-3.5 rounded-xl bg-white text-[var(--bg-base)] hover:bg-slate-100 font-bold flex items-center gap-3 transition-all shadow-lg"
-            >
-              <Smartphone className="w-5 h-5 text-[#353FAB]" />
-              Download APK for Android
-            </a>
-            <a
-              href="#"
-              className="px-7 py-3.5 rounded-xl glass-panel text-white hover:bg-[var(--bg-card-hover)] font-bold flex items-center gap-3 transition-all border border-[var(--border-subtle)]"
-            >
-              <Smartphone className="w-5 h-5 text-white" />
-              Download for iOS (TestFlight)
-            </a>
+          <div className="space-y-4">
+            {faqs.map((faq, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div
+                  key={idx}
+                  onClick={() => setOpenFaq(isOpen ? null : idx)}
+                  className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-white flex items-center gap-2">
+                      <HelpCircle className="w-4 h-4 text-[#8B93FF]" />
+                      {faq.q}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-slate-400 transition-transform ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </div>
+                  {isOpen && (
+                    <p className="text-xs text-slate-300 leading-relaxed pt-2 border-t border-slate-800/80">
+                      {faq.a}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ─── Footer ───────────────────────────────────────────────────── */}
-      <footer className="mt-auto border-t border-[var(--border-subtle)] bg-[var(--bg-sidebar)] py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[var(--text-muted)]">
+      <footer className="py-12 bg-[#05080F] border-t border-slate-900 text-xs text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center text-white font-bold">
+            <div className="w-8 h-8 rounded-xl bg-[#353FAB] flex items-center justify-center text-white font-bold">
               <Shield className="w-4 h-4" />
             </div>
-            <span className="text-sm font-semibold text-white">BeSafe Safety Platform</span>
+            <span className="text-sm font-bold text-white">BeSafe Emergency Network</span>
           </div>
 
-          <p>© {new Date().getFullYear()} BeSafe Network. All rights reserved. For true life-threatening emergencies, always dial 911 / 112.</p>
+          <div className="flex items-center gap-6">
+            <Link href="/login" className="hover:text-white transition-colors">
+              Agency Login
+            </Link>
+            <Link href="/dashboard" className="hover:text-white transition-colors">
+              Live HUD
+            </Link>
+            <a href="#pwa-install" className="hover:text-white transition-colors">
+              PWA Install
+            </a>
+          </div>
 
-          <div className="flex items-center space-x-6">
-            <Link href="/login" className="hover:text-white transition-colors">Agency Login</Link>
-            <Link href="/dashboard" className="hover:text-white transition-colors">Command Monitor</Link>
-            <a href="#features" className="hover:text-white transition-colors">Privacy & Encryption</a>
+          <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+            <span>Operational Mesh Active</span>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

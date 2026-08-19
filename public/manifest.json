@@ -1,0 +1,49 @@
+{
+  "name": "BeSafe Emergency Command & Incident Response",
+  "short_name": "BeSafe",
+  "description": "Tactical emergency response, real-time voice threat triage, and incident dispatch command portal.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#070B14",
+  "theme_color": "#353FAB",
+  "categories": ["safety", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live Vector Radar",
+      "short_name": "Radar",
+      "description": "Open live tactical GPS incident radar",
+      "url": "/dashboard/map",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Emergency Alerts",
+      "short_name": "Alerts",
+      "description": "View incoming distress signals",
+      "url": "/dashboard/alerts",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "SafeChat Reports",
+      "short_name": "SafeChat",
+      "description": "Citizen intelligence and qualitative reports",
+      "url": "/dashboard/reports",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}
