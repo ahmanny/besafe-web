@@ -26,6 +26,8 @@ import {
   ShieldAlert,
   Users,
   Compass,
+  Clock,
+  FolderLock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,23 +38,22 @@ export default function LandingPage() {
 
   const faqs = [
     {
-      q: "How does BeSafe detect threats in the background?",
-      a: "BeSafe uses low-power on-device voice processing and an advanced natural language processing (NLP) model to identify acute distress phrases and emergency sounds. When a threat is verified, an encrypted SOS package is instantly transmitted with zero manual input required.",
+      q: "How does BeSafe detect threats via voice?",
+      a: "BeSafe runs low-power background speech analysis paired with an NLP threat evaluation model. When acute danger keywords or distress signals are recognized, the system automatically initiates an emergency SOS package without requiring manual unlocking.",
     },
     {
-      q: "How does proximity-based agency routing work?",
-      a: "When an SOS is triggered, BeSafe calculates the citizen's exact GPS coordinates and matches them with verified response agencies, safety units, and authorized organizations within that jurisdiction, guaranteeing that the closest available emergency operators receive the distress telemetry.",
+      q: "How does proximity agency routing work?",
+      a: "When an emergency SOS is triggered, BeSafe calculates your live GPS coordinates and automatically routes the alert to the nearest verified response agency, police division, or authorized security unit in that jurisdiction for rapid dispatch.",
     },
     {
-      q: "Can I install BeSafe without downloading from an app store?",
-      a: "Yes! BeSafe is a full Progressive Web App (PWA). You can install it directly onto your iPhone, Android, or desktop browser by tapping 'Install' or 'Add to Home Screen' for instant full-screen offline access.",
+      q: "How does the Timed Safety Check-In feature protect me?",
+      a: "If you are walking alone, commuting at night, or entering unfamiliar surroundings, you can set a countdown timer in the app. If you do not confirm you are safe before the timer expires, BeSafe automatically broadcasts your live location and triggers an SOS to your emergency contacts and nearby response units.",
     },
     {
-      q: "Is SafeChat reporting truly anonymous and secure?",
-      a: "All qualitative reports, evidence attachments, and witness testimonies are protected with 256-bit encryption. Citizens can choose full anonymity, and our AI pattern detection highlights escalation hazards directly to authorized response agencies and support NGOs.",
+      q: "How does SafeChat protect citizen privacy when reporting incidents?",
+      a: "After completing a structured SafeChat report, you have full control over your data: you can choose to save the report securely in your phone's private local storage as a personal record, or submit it to verified response agencies and NGOs whenever you are ready for investigation and support.",
     },
   ];
-
 
   return (
     <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col selection:bg-[#353FAB] selection:text-white font-sans antialiased overflow-x-hidden">
@@ -81,7 +82,7 @@ export default function LandingPage() {
               Capabilities
             </a>
             <a href="#how-it-works" className="hover:text-white transition-colors">
-              Telemetry Flow
+              Safety Mesh
             </a>
             <a href="#perspectives" className="hover:text-white transition-colors">
               Citizen vs Agency
@@ -128,7 +129,7 @@ export default function LandingPage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                Live Emergency Mesh • Proximity-Routed Response
+                Voice Threat AI • Proximity Routing • SafeChat Vault
               </div>
 
               <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
@@ -139,7 +140,7 @@ export default function LandingPage() {
               </h1>
 
               <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                BeSafe safeguards citizens 24/7 with continuous voice threat recognition, one-touch discreet SOS beacons, and encrypted SafeChat intelligence linked directly to verified response agencies and support organizations.
+                BeSafe protects citizens with background voice threat recognition, one-touch SOS with proximity agency routing, timed safety check-in countdowns, and private or agency-submitted SafeChat intelligence.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-3">
@@ -163,23 +164,22 @@ export default function LandingPage() {
 
               {/* Real-time Metrics Pill */}
               <div className="pt-6 grid grid-cols-3 gap-6 max-w-lg mx-auto lg:mx-0 border-t border-slate-800/80 text-left">
-
                 <div>
                   <div className="text-2xl font-extrabold text-white font-mono">&lt; 3.0s</div>
                   <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
-                    Response Latency
+                    Dispatch Latency
                   </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-white font-mono">256-Bit</div>
+                  <div className="text-2xl font-extrabold text-white font-mono">100%</div>
                   <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
-                    Encrypted Evidence
+                    Private Vault or Push
                   </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-emerald-400 font-mono">100%</div>
+                  <div className="text-2xl font-extrabold text-emerald-400 font-mono">Real-Time</div>
                   <div className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
-                    Agency Routing
+                    GPS Proximity
                   </div>
                 </div>
               </div>
@@ -193,11 +193,11 @@ export default function LandingPage() {
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
                     <span className="text-xs font-bold font-mono text-red-400 uppercase">
-                      CRITICAL ALERT • #6A380031
+                      ACTIVE EMERGENCY • #6A380031
                     </span>
                   </div>
                   <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-[10px] font-mono">
-                    VOICE SOS TRIGGER
+                    PROXIMITY ROUTED
                   </Badge>
                 </div>
 
@@ -225,7 +225,6 @@ export default function LandingPage() {
                     <span>FutMinna Police Agency (1.2 km)</span>
                   </div>
                 </div>
-
 
                 {/* AI Threat Classification Box */}
                 <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
@@ -264,58 +263,58 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <h2 className="text-xs font-bold font-mono uppercase tracking-widest text-[#8B93FF]">
-              Core Tactical Architecture
+              Core Architecture
             </h2>
             <p className="text-3xl sm:text-4xl font-extrabold text-white">
-              End-to-End Emergency Intelligence
+              Real Emergency Defense Capabilities
             </p>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Every layer of the BeSafe platform is engineered for zero-latency detection, fail-safe communication, and rapid dispatch.
+              Engineered with proven features designed for rapid detection, fail-safe communication, and rapid agency coordination.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Feature 1 */}
+            {/* Feature 1: Voice Threat NLP */}
             <div className="p-6 rounded-2xl bg-[#0F172A]/70 border border-slate-800 hover:border-[#353FAB]/60 transition-all group shadow-lg hover:shadow-[#353FAB]/10 space-y-4">
               <div className="w-12 h-12 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center font-bold border border-red-500/20 group-hover:scale-110 transition-transform">
                 <Mic className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-white">Voice Threat Recognition</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Background audio pipeline processes acoustic keywords and distress cues, triggering automated alerts without touching the device.
+                Background audio NLP evaluates keywords and distress cues, triggering automated emergency alerts when danger is confirmed.
               </p>
             </div>
 
-            {/* Feature 2 */}
+            {/* Feature 2: Proximity Routing */}
             <div className="p-6 rounded-2xl bg-[#0F172A]/70 border border-slate-800 hover:border-[#353FAB]/60 transition-all group shadow-lg hover:shadow-[#353FAB]/10 space-y-4">
               <div className="w-12 h-12 rounded-xl bg-[#353FAB]/20 text-[#8B93FF] flex items-center justify-center font-bold border border-[#353FAB]/30 group-hover:scale-110 transition-transform">
                 <Compass className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-white">Vector Radar & Proximity</h3>
+              <h3 className="text-base font-bold text-white">Proximity Agency Routing</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Automated Haversine and geospatial indexing routes alerts to the physically closest command post in sub-second timeframes.
+                Geospatial indexing automatically calculates the closest response agency headquarters based on live GPS coordinates.
               </p>
             </div>
 
-            {/* Feature 3 */}
+            {/* Feature 3: Timed Safety Check-in */}
             <div className="p-6 rounded-2xl bg-[#0F172A]/70 border border-slate-800 hover:border-[#353FAB]/60 transition-all group shadow-lg hover:shadow-[#353FAB]/10 space-y-4">
               <div className="w-12 h-12 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center font-bold border border-amber-500/20 group-hover:scale-110 transition-transform">
-                <MessageSquare className="w-6 h-6" />
+                <Clock className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-white">SafeChat Citizen Reports</h3>
+              <h3 className="text-base font-bold text-white">Timed Safety Check-In</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Encrypted qualitative reporting interface with AI-driven escalation dossiers, forensic timelines, and evidence vaults.
+                Set a countdown timer when walking alone. If you do not confirm safety before time expires, an emergency alert triggers automatically.
               </p>
             </div>
 
-            {/* Feature 4 */}
+            {/* Feature 4: SafeChat Private Vault or Agency Push */}
             <div className="p-6 rounded-2xl bg-[#0F172A]/70 border border-slate-800 hover:border-[#353FAB]/60 transition-all group shadow-lg hover:shadow-[#353FAB]/10 space-y-4">
               <div className="w-12 h-12 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold border border-emerald-500/20 group-hover:scale-110 transition-transform">
-                <Users className="w-6 h-6" />
+                <FolderLock className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-white">Multi-Role Agency Dispatch</h3>
+              <h3 className="text-base font-bold text-white">SafeChat Private / Push Vault</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Discrete role segregation between Agency Admins and frontline Operators with live WebSocket assignment queues.
+                Record qualitative reports with media evidence. Keep them stored privately on your phone, or submit to agencies when you are ready.
               </p>
             </div>
           </div>
@@ -366,29 +365,29 @@ export default function LandingPage() {
                 <div className="w-10 h-10 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center font-bold">
                   <Zap className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-bold text-white">Discreet Silent Trigger</h4>
+                <h4 className="text-sm font-bold text-white">One-Touch & Voice SOS</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Trigger an SOS discreetly by voice phrase, lock screen widget, or emergency contact broadcast without raising suspicion.
+                  Trigger an SOS by voice keyword or single tap, notifying both your designated emergency circle and the closest response unit.
                 </p>
               </div>
 
               <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
-                <div className="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
-                  <ShieldAlert className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                  <Clock className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-bold text-white">Real-Time Circle Broadcast</h4>
+                <h4 className="text-sm font-bold text-white">Timed Safety Check-In</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Automatically sends simultaneous SMS alerts with your live location coordinates to all designated family emergency contacts.
+                  Set safety alarms for night walks or unfamiliar travel. Confirm you are safe or let BeSafe automatically alert responders.
                 </p>
               </div>
 
               <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
                 <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                  <Lock className="w-5 h-5" />
+                  <FolderLock className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-bold text-white">Zero-Trace SafeChat</h4>
+                <h4 className="text-sm font-bold text-white">SafeChat Privacy Control</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Submit confidential reports regarding harassment, abuse, or transport hazards with full evidence encryption.
+                  Log harassment or safety hazards. Choose whether to store reports in your private phone vault or push them to agencies.
                 </p>
               </div>
             </div>
@@ -408,9 +407,9 @@ export default function LandingPage() {
                 <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
                   <Cpu className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-bold text-white">Explainable AI Dossiers</h4>
+                <h4 className="text-sm font-bold text-white">AI Pattern Triage Dossiers</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Real-time threat pattern categorization, severity scoring, and evidence summaries generated via Gemini models.
+                  Submitted citizen reports generate structured pattern tags, timeline urgency ratings, and severity scores via AI.
                 </p>
               </div>
 
@@ -428,7 +427,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-
       {/* ─── Official Mobile App Showcase (Google Play & App Store) ───── */}
       <section id="download" className="py-24 border-b border-slate-800/60 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -444,7 +442,7 @@ export default function LandingPage() {
                 </h3>
 
                 <p className="text-sm text-slate-300 leading-relaxed">
-                  Protect yourself and your loved ones everywhere you go. The BeSafe mobile application runs lightweight continuous voice threat recognition, offline SMS broadcast, and direct proximity routing to emergency units.
+                  Protect yourself and your loved ones everywhere you go. The BeSafe mobile application runs lightweight continuous voice threat recognition, timed check-in alarms, and direct proximity routing to emergency units.
                 </p>
 
                 {/* Mobile App Download Cards */}
@@ -485,7 +483,6 @@ export default function LandingPage() {
                 </div>
               </div>
 
-
               {/* Phone Mockup Showcase */}
               <div className="lg:col-span-5 flex justify-center">
                 <div className="w-64 sm:w-72 p-4 rounded-3xl bg-slate-950 border-4 border-slate-800 shadow-2xl space-y-3">
@@ -516,7 +513,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-
       {/* ─── Frequently Asked Questions ───────────────────────────────── */}
       <section id="faq" className="py-24 border-b border-slate-800/60 bg-[#070B14]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -525,7 +521,7 @@ export default function LandingPage() {
               Frequently Asked Questions
             </h2>
             <h3 className="text-3xl font-extrabold text-white">
-              Questions & Security Protocols
+              Questions & Product Protocols
             </h3>
           </div>
 
@@ -578,8 +574,8 @@ export default function LandingPage() {
             <Link href="/dashboard" className="hover:text-white transition-colors">
               Live HUD
             </Link>
-            <a href="#pwa-install" className="hover:text-white transition-colors">
-              PWA Install
+            <a href="#download" className="hover:text-white transition-colors">
+              Mobile App
             </a>
           </div>
 
