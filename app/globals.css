@@ -1,0 +1,132 @@
+@import "tailwindcss";
+@import "mapbox-gl/dist/mapbox-gl.css";
+
+:root {
+  /* Brand Core */
+  --primary: #353FAB;
+  --primary-hover: #2B3394;
+  --primary-light: #4E59D4;
+  --primary-glow: rgba(53, 63, 171, 0.35);
+
+  /* Emergency & Status Indicators */
+  --emergency: #EF4444;
+  --emergency-hover: #DC2626;
+  --emergency-glow: rgba(239, 68, 68, 0.45);
+  --warning: #F59E0B;
+  --warning-glow: rgba(245, 158, 11, 0.35);
+  --success: #10B981;
+  --success-glow: rgba(16, 185, 129, 0.35);
+  --info: #38BDF8;
+  --info-glow: rgba(56, 189, 248, 0.35);
+
+  /* Dark Command Center Surfaces */
+  --bg-base: #080B10;
+  --bg-card: #0F141F;
+  --bg-card-hover: #161D2C;
+  --bg-sidebar: #0B0F17;
+  --bg-elevated: #1B2335;
+  --bg-input: #121824;
+
+  /* Borders & Highlights */
+  --border-subtle: #1E2738;
+  --border-hover: #2D3A54;
+  --border-accent: #353FAB;
+
+  /* Typography */
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-inverse: #080B10;
+
+  /* Background & Foreground mappings for Tailwind */
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+  --color-emergency: var(--emergency);
+  --color-emergency-hover: var(--emergency-hover);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
+  --color-info: var(--info);
+  --color-bg-base: var(--bg-base);
+  --color-bg-card: var(--bg-card);
+  --color-bg-card-hover: var(--bg-card-hover);
+  --color-bg-sidebar: var(--bg-sidebar);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-hover: var(--border-hover);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Custom Glassmorphism & UI Panels */
+.glass-panel {
+  background: rgba(15, 20, 31, 0.82);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-panel-hover:hover {
+  background: rgba(22, 29, 44, 0.9);
+  border-color: var(--border-hover);
+}
+
+.glow-primary {
+  box-shadow: 0 0 20px var(--primary-glow);
+}
+
+.glow-emergency {
+  box-shadow: 0 0 25px var(--emergency-glow);
+}
+
+/* Custom SOS Radar Pulse Animation */
+@keyframes sosPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 16px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.animate-sos-pulse {
+  animation: sosPulse 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+/* Custom Scrollbar for Alert Feeds */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
