@@ -83,6 +83,8 @@ export interface Alert {
   transcribed_text?: string;
   audio_url?: string;
   confidence?: number;
+  gps_lat?: number | null;
+  gps_lng?: number | null;
   user_name?: string;
   user_phone?: string;
   user_photo?: string;
@@ -100,6 +102,7 @@ export interface Alert {
     lng?: number;
     address?: string;
   };
+
   user?: UserSummary;
   gps_trail?: GPSCoordinate[];
   created_at?: string;

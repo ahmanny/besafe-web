@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { X, Map, ShieldAlert, Navigation, Phone, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Alert } from "@/types";
+import { getAlertCoords } from "./MapboxView";
 
 const MapboxView = dynamic(() => import("@/components/map/MapboxView"), {
   ssr: false,
@@ -32,11 +33,15 @@ export function QuickMapModal({
 }: QuickMapModalProps) {
   if (!isOpen) return null;
 
-  const centerCoordinates: [number, number] = selectedAlert?.location
-    ? [selectedAlert.location.longitude, selectedAlert.location.latitude]
-    : agencyLocation
+  const alertCoords = getAlertCoords(selectedAlert);
+  const centerCoordinates: [number, number] = alertCoords
+    ? [alertCoords.lng, alertCoords.lat]
+    : agencyLocation && agencyLocation.longitude && agencyLocation.latitude
     ? [agencyLocation.longitude, agencyLocation.latitude]
-    : [32.5599, 15.5007];
+    : [7.515401, 8.92997];
+
+  const callerName = selectedAlert?.user?.name || selectedAlert?.user_name || "Anonymous Citizen";
+  const callerPhone = selectedAlert?.user?.phone || selectedAlert?.user_phone;
 
   return (
     <div
@@ -60,7 +65,7 @@ export function QuickMapModal({
                   : "Command Vector Radar"}
               </h2>
               <p className="text-[11px] text-muted-foreground">
-                {selectedAlert?.location?.address || "Real-time emergency telemetry grid"}
+                {selectedAlert?.transcribed_text || selectedAlert?.description || "Real-time emergency telemetry grid"}
               </p>
             </div>
           </div>
@@ -78,9 +83,9 @@ export function QuickMapModal({
         <div className="relative w-full h-[400px] sm:h-[480px]">
           <MapboxView
             alerts={selectedAlert ? [selectedAlert] : alerts}
-            selectedAlertId={selectedAlert ? (typeof selectedAlert.id === "number" ? selectedAlert.id : Number(selectedAlert.id)) : undefined}
+            selectedAlertId={selectedAlert ? selectedAlert.id : undefined}
             center={centerCoordinates}
-            zoom={selectedAlert ? 15 : 12}
+            zoom={selectedAlert && alertCoords ? 15 : 12}
             agencyLocation={agencyLocation}
             className="w-full h-full"
           />
@@ -92,30 +97,28 @@ export function QuickMapModal({
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-1.5 font-medium text-foreground">
                 <User className="w-3.5 h-3.5 text-primary" />
-                <span>{selectedAlert.user?.name || "Anonymous Citizen"}</span>
+                <span>{callerName}</span>
               </div>
-              {selectedAlert.user?.phone && (
+              {callerPhone && (
                 <div className="flex items-center gap-1.5 text-muted-foreground font-mono">
                   <Phone className="w-3.5 h-3.5 text-primary" />
-                  <span>{selectedAlert.user.phone}</span>
+                  <span>{callerPhone}</span>
                 </div>
               )}
-              <div className="text-primary font-mono text-[11px]">
-                {selectedAlert.location?.latitude?.toFixed(4)}° N,{" "}
-                {selectedAlert.location?.longitude?.toFixed(4)}° E
-              </div>
+              {alertCoords && (
+                <div className="text-primary font-mono text-[11px]">
+                  📍 {alertCoords.lat.toFixed(4)}°, {alertCoords.lng.toFixed(4)}°
+                </div>
+              )}
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={onClose}
-                className="h-8 text-xs flex-1 sm:flex-none"
-              >
-                Close View
-              </Button>
-            </div>
+            <Button
+              size="sm"
+              onClick={onClose}
+              className="h-7 px-3 text-xs font-semibold self-end sm:self-auto"
+            >
+              Close Radar
+            </Button>
           </div>
         )}
       </div>

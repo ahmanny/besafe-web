@@ -44,15 +44,27 @@ export default function LiveVectorRadarPage() {
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateAlertStatus();
 
   const [selectedAlertId, setSelectedAlertId] = useState<string | number | null>(null);
-  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "dispatched">("active");
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "dispatched">("all");
   const [mapStyle, setMapStyle] = useState<"dark" | "satellite" | "streets">("dark");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Extract Agency Command Center Database Coordinates
+  const agencyLat = Number(
+    agency?.location?.latitude ?? agency?.location?.lat ?? agency?.latitude ?? 8.92997
+  );
+  const agencyLng = Number(
+    agency?.location?.longitude ?? agency?.location?.lng ?? agency?.longitude ?? 7.515401
+  );
+
   const filteredAlerts = alerts.filter((a) => {
+    const callerName = a.user?.name || a.user_name || "";
+    const desc = a.transcribed_text || a.description || "";
+    const id = String(a.id);
+
     const matchesSearch =
-      (a.user?.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (a.description || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      String(a.id).includes(searchQuery);
+      callerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      id.includes(searchQuery);
 
     if (!matchesSearch) return false;
     if (filterStatus === "active") return a.status === "active";
@@ -61,21 +73,26 @@ export default function LiveVectorRadarPage() {
   });
 
   const selectedAlert =
-    alerts.find((a) => a.id === selectedAlertId) || filteredAlerts[0] || null;
+    alerts.find((a) => String(a.id) === String(selectedAlertId)) ||
+    filteredAlerts[0] ||
+    null;
 
   const handleStatusChange = (newStatus: AlertStatus) => {
     if (!selectedAlert) return;
     updateStatus({ id: selectedAlert.id, status: newStatus });
   };
 
-  const activeCount = alerts.filter((a) => a.status === "active").length;
+  const selectedLat = selectedAlert?.gps_lat ?? selectedAlert?.location?.latitude ?? selectedAlert?.location?.lat;
+  const selectedLng = selectedAlert?.gps_lng ?? selectedAlert?.location?.longitude ?? selectedAlert?.location?.lng;
+  const selectedCallerName = selectedAlert?.user?.name || selectedAlert?.user_name || "Anonymous Citizen";
+  const selectedCallerPhone = selectedAlert?.user?.phone || selectedAlert?.user_phone || "No phone listed";
 
   return (
     <div className="space-y-4 animate-in fade-in-50 duration-200 flex flex-col h-[calc(100vh-7.5rem)]">
       {/* ─── 1. Header ────────────────────────────────────────────── */}
       <AdminPageHeader
         title="Live Vector Radar"
-        subtitle="Real-time tactical GPS telemetry, active distress beacons, and vector motion paths"
+        subtitle={`Command Center: ${agency?.name || "Station HQ"} • Tactical GPS telemetry and active distress beacons`}
         action={
           <div className="flex items-center gap-2">
             {/* Map Style Selector */}
@@ -157,8 +174,11 @@ export default function LiveVectorRadarPage() {
                 </div>
               ) : (
                 filteredAlerts.map((alert) => {
-                  const isSelected = alert.id === selectedAlert?.id;
+                  const isSelected = String(alert.id) === String(selectedAlert?.id);
                   const isActive = alert.status === "active";
+                  const callerName = alert.user?.name || alert.user_name || `Distress #${alert.id}`;
+                  const alertLat = alert.gps_lat ?? alert.location?.latitude ?? alert.location?.lat;
+                  const alertLng = alert.gps_lng ?? alert.location?.longitude ?? alert.location?.lng;
 
                   return (
                     <div
@@ -172,10 +192,10 @@ export default function LiveVectorRadarPage() {
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-foreground truncate max-w-[170px]">
-                          {alert.user?.name || `Distress #${alert.id}`}
+                          {callerName}
                         </span>
                         <Badge
-                          variant={isActive ? "destructive" : "warning"}
+                          variant={isActive ? "destructive" : alert.status === "resolved" ? "success" : "warning"}
                           className="text-[9px] uppercase font-bold px-1.5 py-0"
                         >
                           {alert.status}
@@ -183,12 +203,12 @@ export default function LiveVectorRadarPage() {
                       </div>
 
                       <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
-                        {alert.description || "Direct GPS SOS trigger"}
+                        {alert.transcribed_text || alert.description || "Direct GPS SOS trigger"}
                       </p>
 
                       <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono mt-1">
                         <span className="truncate max-w-[150px]">
-                          📍 {alert.location?.address || "GPS Position Logged"}
+                          {alertLat && alertLng ? `📍 ${alertLat.toFixed(4)}°, ${alertLng.toFixed(4)}°` : "📍 Manual Beacon (No GPS)"}
                         </span>
                         <span>{timeAgo(alert.created_at)}</span>
                       </div>
@@ -208,11 +228,11 @@ export default function LiveVectorRadarPage() {
                     Incident #{selectedAlert.id}
                   </span>
                   <h3 className="text-xs font-bold text-foreground mt-0.5 line-clamp-1">
-                    {selectedAlert.description || "SOS Distress Signal"}
+                    {selectedAlert.transcribed_text || selectedAlert.description || "SOS Distress Signal"}
                   </h3>
                 </div>
                 <Badge
-                  variant={selectedAlert.status === "active" ? "destructive" : "warning"}
+                  variant={selectedAlert.status === "active" ? "destructive" : selectedAlert.status === "resolved" ? "success" : "warning"}
                   className="text-[9px] uppercase font-bold"
                 >
                   {selectedAlert.status}
@@ -226,27 +246,34 @@ export default function LiveVectorRadarPage() {
                     <User className="w-3 h-3 text-primary" /> Caller:
                   </span>
                   <span className="font-semibold text-foreground">
-                    {selectedAlert.user?.name || "Anonymous Citizen"}
+                    {selectedCallerName}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                     <PhoneCall className="w-3 h-3 text-emerald-400" /> Contact:
                   </span>
-                  <a
-                    href={`tel:${selectedAlert.user?.phone}`}
-                    className="text-emerald-400 hover:underline font-mono text-[11px]"
-                  >
-                    {selectedAlert.user?.phone || "No phone listed"}
-                  </a>
+                  {selectedCallerPhone !== "No phone listed" ? (
+                    <a
+                      href={`tel:${selectedCallerPhone}`}
+                      className="text-emerald-400 hover:underline font-mono text-[11px]"
+                    >
+                      {selectedCallerPhone}
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground font-mono text-[11px]">
+                      {selectedCallerPhone}
+                    </span>
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                     <MapPin className="w-3 h-3 text-primary" /> Coordinates:
                   </span>
                   <span className="font-mono text-[11px] text-primary">
-                    {(selectedAlert.location?.latitude || selectedAlert.location?.lat || 0).toFixed(4)}°,{" "}
-                    {(selectedAlert.location?.longitude || selectedAlert.location?.lng || 0).toFixed(4)}°
+                    {selectedLat && selectedLng
+                      ? `${Number(selectedLat).toFixed(4)}°, ${Number(selectedLng).toFixed(4)}°`
+                      : "No GPS fix (Manual SOS beacon)"}
                   </span>
                 </div>
               </div>
@@ -255,12 +282,12 @@ export default function LiveVectorRadarPage() {
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   size="sm"
-                  onClick={() => handleStatusChange("dispatched")}
-                  disabled={isUpdating || selectedAlert.status === "dispatched"}
-                  className="h-8 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground"
+                  onClick={() => handleStatusChange("acknowledged")}
+                  disabled={isUpdating || selectedAlert.status === "acknowledged"}
+                  className="h-8 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white"
                 >
                   <Send className="w-3 h-3 mr-1" />
-                  <span>Dispatch</span>
+                  <span>Acknowledge</span>
                 </Button>
 
                 <Button
@@ -294,19 +321,17 @@ export default function LiveVectorRadarPage() {
             alerts={filteredAlerts}
             selectedAlertId={selectedAlert?.id}
             onSelectAlert={(a) => setSelectedAlertId(a.id)}
+            center={[agencyLng, agencyLat]}
+            agencyLocation={{
+              latitude: agencyLat,
+              longitude: agencyLng,
+              name: agency?.name || "Station HQ",
+            }}
             mapStyle={mapStyle}
             zoom={13}
             interactive={true}
             showControls={true}
-            agencyLocation={
-              agency
-                ? {
-                    latitude: agency.location?.lat || agency.latitude || 15.5007,
-                    longitude: agency.location?.lng || agency.longitude || 32.5599,
-                    name: agency.name,
-                  }
-                : undefined
-            }
+            className="w-full h-full"
           />
         </div>
       </div>
