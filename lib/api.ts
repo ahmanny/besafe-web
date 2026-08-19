@@ -1,58 +1,24 @@
-import axios from "axios"
+import { apiClient } from "./api/client"
 import type { Agency, Alert, AlertStatus, DashboardStats, Report } from "@/types"
+import type { StaffMember, StaffCreateInput, StaffRole } from "@/types/auth"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://besafe-server-production.up.railway.app/v1"
-
-export const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  timeout: 15000,
-})
-
-// Request interceptor to attach JWT Token
-apiClient.interceptors.request.use(
-  (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("besafe_agency_token")
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
-)
-
-// Response interceptor to handle session expiration
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401 && typeof window !== "undefined") {
-      localStorage.removeItem("besafe_agency_token")
-      localStorage.removeItem("besafe_agency_profile")
-      if (window.location.pathname.startsWith("/dashboard")) {
-        window.location.href = "/login"
-      }
-    }
-    return Promise.reject(error)
-  }
-)
-
-/* API Service Endpoints */
+export { apiClient }
 
 export const authApi = {
-  login: async (credentials: { email: string; password?: string; access_code?: string }) => {
-    const res = await apiClient.post<{ token: string; agency: Agency }>("/agency/login", credentials)
+  login: async (credentials: { email: string; password?: string }) => {
+    const res = await apiClient.post<{ token: string; must_change_password?: boolean; agency: Agency; user?: any }>("/agency/auth/login", credentials)
     return res.data
   },
-  register: async (agencyData: Partial<Agency> & { password?: string }) => {
-    const res = await apiClient.post<{ token: string; agency: Agency }>("/agency/register", agencyData)
+  register: async (agencyData: any) => {
+    const res = await apiClient.post<{ success: boolean; message: string; id: string }>("/auth/register", agencyData)
     return res.data
   },
   getProfile: async () => {
-    const res = await apiClient.get<Agency>("/agency/profile")
+    const res = await apiClient.get<Agency>("/agency/auth/me")
+    return res.data
+  },
+  changeInitialPassword: async (data: { new_password: string; staff_id?: string; email?: string }) => {
+    const res = await apiClient.patch<{ success: boolean; message: string }>("/agency/auth/change-initial-password", data)
     return res.data
   },
 }
@@ -62,18 +28,29 @@ export const alertsApi = {
     const res = await apiClient.get<Alert[]>("/alerts", { params })
     return res.data
   },
-  getAlertById: async (id: number) => {
+  getAlertById: async (id: string | number) => {
     const res = await apiClient.get<Alert>(`/alerts/${id}`)
     return res.data
   },
-  updateStatus: async (id: number, status: AlertStatus, notes?: string) => {
-    const res = await apiClient.put<Alert>(`/alerts/${id}/status`, { status, notes })
+  updateStatus: async (id: string | number, status: AlertStatus, notes?: string) => {
+    const res = await apiClient.patch<Alert>(`/alerts/${id}/status`, { status, notes })
     return res.data
   },
-  getLiveCoords: async (alertId: number) => {
-    const res = await apiClient.get<{ latitude: number; longitude: number; speed?: number; heading?: number }>(`/alerts/${alertId}/live`)
+  assignAlert: async (id: string | number, staffId: string | null, staffName?: string | null) => {
+    const res = await apiClient.patch<{ success: boolean; message: string; assigned_staff_id: string | null; assigned_staff_name: string | null }>(`/alerts/${id}/assign`, {
+      staff_id: staffId,
+      staff_name: staffName,
+    })
     return res.data
-  }
+  },
+  getLiveCoords: async (alertId: string | number) => {
+    const res = await apiClient.get<{ latitude: number; longitude: number; speed?: number; heading?: number }>(`/alerts/${alertId}`)
+    return res.data
+  },
+  analyzeAlert: async (alertId: string | number) => {
+    const res = await apiClient.post<{ success: boolean; analysis: any }>(`/alerts/${alertId}/analyze`)
+    return res.data
+  },
 }
 
 export const reportsApi = {
@@ -81,19 +58,77 @@ export const reportsApi = {
     const res = await apiClient.get<Report[]>("/agency/reports", { params })
     return res.data
   },
-  getReportById: async (id: number) => {
+  getReportById: async (id: string | number) => {
     const res = await apiClient.get<Report>(`/agency/reports/${id}`)
     return res.data
   },
-  updateStatus: async (id: number, status: "pending" | "investigating" | "closed") => {
+  updateStatus: async (id: string | number, status: string) => {
     const res = await apiClient.patch<Report>(`/agency/reports/${id}/status`, { status })
     return res.data
-  }
+  },
+  assignReport: async (id: string | number, staffId: string | null, staffName?: string | null) => {
+    const res = await apiClient.patch<{ success: boolean; message: string; assigned_staff_id: string | null; assigned_staff_name: string | null }>(`/agency/reports/${id}/assign`, {
+      staff_id: staffId,
+      staff_name: staffName,
+    })
+    return res.data
+  },
+  analyzeReport: async (reportId: string | number) => {
+    const res = await apiClient.post<{ success: boolean; analysis: any }>(`/agency/reports/${reportId}/analyze`)
+    return res.data
+  },
 }
+
 
 export const statsApi = {
   getStats: async () => {
-    const res = await apiClient.get<DashboardStats>("/agency/stats")
+    const res = await apiClient.get<DashboardStats>("/agency/dashboard/stats")
     return res.data
-  }
+  },
 }
+
+export const teamApi = {
+  getTeam: async () => {
+    const res = await apiClient.get<StaffMember[]>("/agency/team")
+    return res.data
+  },
+  addMember: async (data: StaffCreateInput) => {
+    const res = await apiClient.post<{ success: boolean; member: StaffMember }>("/agency/team", data)
+    return res.data
+  },
+  updateRole: async (staffId: string, role: StaffRole) => {
+    const res = await apiClient.patch<{ success: boolean; role: StaffRole }>(`/agency/team/${staffId}/role`, { role })
+    return res.data
+  },
+  updateStatus: async (staffId: string, isActive: boolean) => {
+    const res = await apiClient.patch<{ success: boolean; is_active: boolean }>(`/agency/team/${staffId}/status`, { is_active: isActive })
+    return res.data
+  },
+}
+
+export const adminApi = {
+  getAgencies: async () => {
+    const res = await apiClient.get<Agency[]>("/admin/agencies")
+    return res.data
+  },
+  verifyAgency: async (agencyId: string, isVerified: boolean) => {
+    const res = await apiClient.patch<{ success: boolean; is_verified: boolean }>(`/admin/agencies/${agencyId}/verify`, { is_verified: isVerified })
+    return res.data
+  },
+}
+
+export const agencySettingsApi = {
+  updateDetails: async (details: { name: string; email: string; region?: string; phone_number?: string }) => {
+    const res = await apiClient.patch<{ success: boolean; message: string }>("/agency/details", details)
+    return res.data
+  },
+  updateLocation: async (location: { lat: number; lng: number }) => {
+    const res = await apiClient.patch<{ success: boolean; message: string }>("/agency/location", location)
+    return res.data
+  },
+  updatePassword: async (passwords: { current_password?: string; new_password?: string }) => {
+    const res = await apiClient.patch<{ success: boolean; message: string }>("/agency/password", passwords)
+    return res.data
+  },
+}
+

@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { QueryProvider } from "@/providers/QueryProvider"
+import { Toaster } from "sonner"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,11 +15,11 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "BeSafe — Modern Emergency Response & Safe Reporting Platform",
+  title: "BeSafe Agency Command — Emergency Dispatch & Response Portal",
   description:
-    "Real-time threat detection, discreet SOS triggers, anonymous Safe Chat reporting, and intelligent emergency agency dispatching.",
+    "Real-time threat triage, high-speed SOS dispatch, anonymous citizen reports, and tactical agency command center.",
   keywords: ["emergency response", "safety app", "threat detection", "dispatch command center", "safe chat"],
-  authors: [{ name: "BeSafe Team" }],
+  authors: [{ name: "BeSafe Command Team" }],
 }
 
 export const viewport = {
@@ -33,8 +34,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark`}>
-      <body className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] antialiased selection:bg-[var(--primary)] selection:text-white">
-        <QueryProvider>{children}</QueryProvider>
+      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground">
+        <QueryProvider>
+          {children}
+          <Toaster
+            position="top-right"
+            richColors
+            toastOptions={{
+              style: {
+                background: "#0F172A",
+                border: "1px solid #1E293B",
+                color: "#F8FAFC",
+              },
+            }}
+          />
+        </QueryProvider>
       </body>
     </html>
   )

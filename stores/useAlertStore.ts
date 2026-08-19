@@ -3,7 +3,7 @@ import type { Alert, LiveLocationUpdate } from "@/types"
 
 interface AlertState {
   alerts: Alert[]
-  selectedAlertId: number | null
+  selectedAlertId: number | string | null
   soundAlertsEnabled: boolean
   isEmergencyModalOpen: boolean
   latestEmergency: Alert | null
@@ -12,7 +12,7 @@ interface AlertState {
   addAlert: (alert: Alert) => void
   updateAlert: (alert: Alert) => void
   updateLocation: (update: LiveLocationUpdate) => void
-  setSelectedAlertId: (id: number | null) => void
+  setSelectedAlertId: (id: number | string | null) => void
   toggleSoundAlerts: () => void
   dismissLatestEmergency: () => void
 }

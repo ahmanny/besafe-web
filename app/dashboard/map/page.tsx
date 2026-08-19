@@ -1,254 +1,308 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import dynamic from "next/dynamic"
+import { useState } from "react";
+import dynamic from "next/dynamic";
 import {
-  AlertTriangle,
-  MapPin,
-  PhoneCall,
-  User,
-  Shield,
-  Clock,
-  CheckCircle2,
   Radio,
-  Volume2,
-  ChevronRight,
+  User,
+  PhoneCall,
+  MapPin,
+  Clock,
   Layers,
-  Sparkles,
-} from "lucide-react"
-import { useAuthStore } from "@/stores/useAuthStore"
-import { useAlertStore } from "@/stores/useAlertStore"
-import { alertsApi } from "@/lib/api"
-import type { Alert } from "@/types"
+  Search,
+  CheckCircle2,
+  AlertTriangle,
+  Send,
+  XCircle,
+  Loader2,
+  Shield,
+} from "lucide-react";
+import { AdminPageHeader } from "@/components/shared/admin-page-header";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useAgencyAuthStore } from "@/lib/store/agency-auth-store";
+import { useGetAlerts, useUpdateAlertStatus } from "@/lib/hooks/dispatch/use-dispatch-data";
+import { timeAgo } from "@/lib/utils/format";
+import type { Alert, AlertStatus } from "@/types";
 
 const MapboxView = dynamic(() => import("@/components/map/MapboxView"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full min-h-[500px] flex items-center justify-center bg-[var(--bg-card)] rounded-2xl border border-[var(--border-subtle)]">
-      <div className="flex items-center space-x-3 text-[var(--text-secondary)]">
-        <div className="w-6 h-6 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
+    <div className="w-full h-full min-h-[500px] flex items-center justify-center bg-card rounded-2xl border border-border/80">
+      <div className="flex items-center space-x-3 text-muted-foreground">
+        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         <span className="text-sm font-semibold">Initializing Vector Command Radar...</span>
       </div>
     </div>
   ),
-})
+});
 
-export default function LiveMapCommandPage() {
-  const { agency } = useAuthStore()
-  const { alerts, selectedAlertId, setSelectedAlertId, updateAlert } = useAlertStore()
-  const [filterPriority, setFilterPriority] = useState<"all" | "high" | "active">("all")
+export default function LiveVectorRadarPage() {
+  const agency = useAgencyAuthStore((s) => s.agency);
+  const { data: alerts = [], isLoading, refetch } = useGetAlerts({ status: "all" });
+  const { mutate: updateStatus, isPending: isUpdating } = useUpdateAlertStatus();
+
+  const [selectedAlertId, setSelectedAlertId] = useState<string | number | null>(null);
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "dispatched">("active");
+  const [mapStyle, setMapStyle] = useState<"dark" | "satellite" | "streets">("dark");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredAlerts = alerts.filter((a) => {
-    if (filterPriority === "active") return a.status === "active"
-    if (filterPriority === "high") return a.priority === "high"
-    return true
-  })
+    const matchesSearch =
+      (a.user?.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (a.description || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      String(a.id).includes(searchQuery);
 
-  const selectedAlert = alerts.find((a) => a.id === selectedAlertId) || filteredAlerts[0]
+    if (!matchesSearch) return false;
+    if (filterStatus === "active") return a.status === "active";
+    if (filterStatus === "dispatched") return a.status === "dispatched";
+    return true;
+  });
 
-  const handleStatusChange = async (newStatus: Alert["status"]) => {
-    if (!selectedAlert) return
-    const updated = { ...selectedAlert, status: newStatus }
-    updateAlert(updated)
-    try {
-      await alertsApi.updateStatus(selectedAlert.id, newStatus)
-    } catch {
-      // local state update maintained
-    }
-  }
+  const selectedAlert =
+    alerts.find((a) => a.id === selectedAlertId) || filteredAlerts[0] || null;
+
+  const handleStatusChange = (newStatus: AlertStatus) => {
+    if (!selectedAlert) return;
+    updateStatus({ id: selectedAlert.id, status: newStatus });
+  };
+
+  const activeCount = alerts.filter((a) => a.status === "active").length;
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex flex-col space-y-4">
-      {/* ─── Top Filter & Status Strip ─────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl glass-panel border border-[var(--border-subtle)]">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-red-500/20 text-[var(--emergency)] flex items-center justify-center font-bold">
-            <Radio className="w-5 h-5 animate-pulse" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-white flex items-center gap-2">
-              Live Mapbox Command Center
-              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-medium border border-emerald-500/30">
-                Vector Stream Active
-              </span>
-            </h1>
-            <p className="text-xs text-[var(--text-muted)]">
-              Station Sector: {agency?.name || "Metropolitan Safety HQ"} • Radius: {agency?.coverage_radius_km || 25} km
-            </p>
-          </div>
-        </div>
-
-        {/* Quick Filter Buttons */}
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setFilterPriority("all")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              filterPriority === "all"
-                ? "bg-[var(--primary)] text-white shadow-md"
-                : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-white"
-            }`}
-          >
-            All Beacons ({alerts.length})
-          </button>
-          <button
-            onClick={() => setFilterPriority("active")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              filterPriority === "active"
-                ? "bg-[var(--emergency)] text-white shadow-md"
-                : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-white"
-            }`}
-          >
-            Active SOS ({alerts.filter((a) => a.status === "active").length})
-          </button>
-        </div>
-      </div>
-
-      {/* ─── Map Canvas & Floating Triage Drawer ─────────────────────── */}
-      <div className="flex-1 grid lg:grid-cols-12 gap-4 min-h-0 relative">
-        {/* Left Side: Incident Selection & Triage Drawer (4 cols) */}
-        <div className="lg:col-span-4 flex flex-col space-y-4 overflow-y-auto">
-          {/* Active Emergencies Queue */}
-          <div className="p-4 rounded-2xl glass-panel border border-[var(--border-subtle)] flex-1 flex flex-col space-y-3 min-h-[220px]">
-            <div className="flex items-center justify-between pb-2 border-b border-[var(--border-subtle)]">
-              <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                Jurisdiction Queue ({filteredAlerts.length})
-              </span>
-              <span className="text-[10px] text-emerald-400 font-mono">Live GPS Sync</span>
+    <div className="space-y-4 animate-in fade-in-50 duration-200 flex flex-col h-[calc(100vh-7.5rem)]">
+      {/* ─── 1. Header ────────────────────────────────────────────── */}
+      <AdminPageHeader
+        title="Live Vector Radar"
+        subtitle="Real-time tactical GPS telemetry, active distress beacons, and vector motion paths"
+        action={
+          <div className="flex items-center gap-2">
+            {/* Map Style Selector */}
+            <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-xl border border-border/60">
+              <Layers className="w-3.5 h-3.5 ml-1.5 text-muted-foreground" />
+              {(["dark", "satellite", "streets"] as const).map((style) => (
+                <button
+                  key={style}
+                  type="button"
+                  onClick={() => setMapStyle(style)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold capitalize transition-all ${
+                    mapStyle === style
+                      ? "bg-card text-foreground shadow-sm font-bold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {style}
+                </button>
+              ))}
             </div>
+          </div>
+        }
+      />
 
-            <div className="flex-1 space-y-2 overflow-y-auto pr-1">
-              {filteredAlerts.length === 0 ? (
-                <div className="text-center py-8 text-xs text-[var(--text-muted)]">No active emergency signals</div>
+      {/* ─── 2. Tactical Canvas & Split Telemetry Queue ────────────── */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0">
+        {/* ════ LEFT COLUMN: Telemetry Triage Drawer (4 cols) ════ */}
+        <div className="lg:col-span-4 flex flex-col gap-3 min-h-0 overflow-hidden">
+          {/* Active Emergencies Queue Card */}
+          <Card className="border-border/80 bg-card/90 shadow-lg backdrop-blur-md overflow-hidden flex flex-col flex-1 min-h-[220px]">
+            <CardHeader className="p-3.5 border-b border-border/80 bg-secondary/10 shrink-0">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <Radio className="w-3.5 h-3.5 text-destructive animate-pulse" />
+                  <span>Distress Telemetry ({filteredAlerts.length})</span>
+                </CardTitle>
+                <div className="flex items-center gap-1">
+                  {(["active", "dispatched", "all"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setFilterStatus(tab)}
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase transition-colors ${
+                        filterStatus === tab
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative mt-2">
+                <Search className="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Filter by caller, ID, or description..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-2.5 py-1 rounded-lg bg-background/80 border border-border/60 text-[11px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+            </CardHeader>
+
+            <CardContent className="p-0 flex-1 overflow-y-auto divide-y divide-border/40">
+              {isLoading ? (
+                <div className="p-8 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  <span>Syncing GPS telemetry...</span>
+                </div>
+              ) : filteredAlerts.length === 0 ? (
+                <div className="p-8 text-center text-xs text-muted-foreground space-y-1">
+                  <Shield className="w-8 h-8 mx-auto text-emerald-400 opacity-80" />
+                  <p className="font-semibold text-foreground">Sector Clear</p>
+                  <p className="text-[11px]">No active distress signals matching filter</p>
+                </div>
               ) : (
                 filteredAlerts.map((alert) => {
-                  const isSelected = alert.id === (selectedAlert?.id ?? null)
-                  const isActive = alert.status === "active"
+                  const isSelected = alert.id === selectedAlert?.id;
+                  const isActive = alert.status === "active";
+
                   return (
                     <div
                       key={alert.id}
                       onClick={() => setSelectedAlertId(alert.id)}
-                      className={`p-3.5 rounded-xl cursor-pointer transition-all border ${
+                      className={`p-3 cursor-pointer transition-all ${
                         isSelected
-                          ? "bg-[var(--primary)]/20 border-[var(--primary)] shadow-md"
-                          : isActive
-                          ? "bg-[var(--bg-card)] border-red-500/30 hover:border-red-500"
-                          : "bg-[var(--bg-card)] border-[var(--border-subtle)] hover:border-[var(--border-hover)]"
+                          ? "bg-primary/15 border-l-4 border-l-primary"
+                          : "hover:bg-muted/40"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span
-                          className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded ${
-                            isActive ? "bg-[var(--emergency)] text-white" : "bg-[var(--bg-elevated)] text-[var(--text-muted)]"
-                          }`}
+                        <span className="text-xs font-bold text-foreground truncate max-w-[170px]">
+                          {alert.user?.name || `Distress #${alert.id}`}
+                        </span>
+                        <Badge
+                          variant={isActive ? "destructive" : "warning"}
+                          className="text-[9px] uppercase font-bold px-1.5 py-0"
                         >
                           {alert.status}
-                        </span>
-                        <span className="text-[10px] text-[var(--text-muted)] font-mono">
-                          {new Date(alert.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </span>
+                        </Badge>
                       </div>
-                      <h4 className="text-xs font-bold text-white mt-1.5 truncate">{alert.description || "SOS Alert"}</h4>
-                      <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 flex items-center justify-between">
-                        <span>{alert.user?.name || "Citizen"}</span>
-                        <span className="font-mono text-[10px] text-[var(--info)]">
-                          {alert.location?.latitude.toFixed(2)}°, {alert.location?.longitude.toFixed(2)}°
-                        </span>
+
+                      <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
+                        {alert.description || "Direct GPS SOS trigger"}
                       </p>
+
+                      <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono mt-1">
+                        <span className="truncate max-w-[150px]">
+                          📍 {alert.location?.address || "GPS Position Logged"}
+                        </span>
+                        <span>{timeAgo(alert.created_at)}</span>
+                      </div>
                     </div>
-                  )
+                  );
                 })
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Selected Incident Deep-Dive Panel */}
+          {/* Selected Emergency Quick Action HUD */}
           {selectedAlert && (
-            <div className="p-5 rounded-2xl glass-panel border border-[var(--primary)]/40 shadow-xl space-y-4">
+            <Card className="border-border/80 bg-card/95 shadow-xl backdrop-blur-md p-4 shrink-0 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-mono text-[var(--primary-light)] uppercase font-bold">
+                  <span className="text-[10px] font-mono text-primary uppercase font-bold">
                     Incident #{selectedAlert.id}
                   </span>
-                  <h3 className="text-base font-bold text-white mt-0.5">{selectedAlert.description || "SOS Distress Signal"}</h3>
+                  <h3 className="text-xs font-bold text-foreground mt-0.5 line-clamp-1">
+                    {selectedAlert.description || "SOS Distress Signal"}
+                  </h3>
                 </div>
-                <span
-                  className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase border ${
-                    selectedAlert.status === "active"
-                      ? "bg-red-500/20 text-[var(--emergency)] border-red-500/40"
-                      : "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
-                  }`}
+                <Badge
+                  variant={selectedAlert.status === "active" ? "destructive" : "warning"}
+                  className="text-[9px] uppercase font-bold"
                 >
                   {selectedAlert.status}
-                </span>
+                </Badge>
               </div>
 
-              {/* Citizen Information */}
-              <div className="p-3.5 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] space-y-2 text-xs">
+              {/* Citizen Details */}
+              <div className="p-2.5 rounded-xl bg-background/80 border border-border/60 space-y-1.5 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-[var(--text-muted)] flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-[var(--primary-light)]" /> Name:
+                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                    <User className="w-3 h-3 text-primary" /> Caller:
                   </span>
-                  <span className="text-white font-semibold">{selectedAlert.user?.name || "Anonymous User"}</span>
+                  <span className="font-semibold text-foreground">
+                    {selectedAlert.user?.name || "Anonymous Citizen"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--text-muted)] flex items-center gap-1.5">
-                    <PhoneCall className="w-3.5 h-3.5 text-emerald-400" /> Phone:
+                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                    <PhoneCall className="w-3 h-3 text-emerald-400" /> Contact:
                   </span>
-                  <a href={`tel:${selectedAlert.user?.phone}`} className="text-emerald-400 hover:underline font-mono">
+                  <a
+                    href={`tel:${selectedAlert.user?.phone}`}
+                    className="text-emerald-400 hover:underline font-mono text-[11px]"
+                  >
                     {selectedAlert.user?.phone || "No phone listed"}
                   </a>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--text-muted)] flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-[var(--info)]" /> Address:
+                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-primary" /> Coordinates:
                   </span>
-                  <span className="text-white truncate max-w-[180px]">{selectedAlert.location?.address || "GPS Position"}</span>
+                  <span className="font-mono text-[11px] text-primary">
+                    {(selectedAlert.location?.latitude || selectedAlert.location?.lat || 0).toFixed(4)}°,{" "}
+                    {(selectedAlert.location?.longitude || selectedAlert.location?.lng || 0).toFixed(4)}°
+                  </span>
                 </div>
               </div>
 
-              {/* Dispatch Action Buttons */}
-              <div className="grid grid-cols-2 gap-2">
-                {selectedAlert.status === "active" && (
-                  <button
-                    onClick={() => handleStatusChange("dispatched")}
-                    className="py-2.5 px-3 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-xs font-bold transition-all shadow-md"
-                  >
-                    Dispatch Squad
-                  </button>
-                )}
-                {selectedAlert.status === "dispatched" && (
-                  <button
-                    onClick={() => handleStatusChange("resolved")}
-                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all"
-                  >
-                    Mark Resolved
-                  </button>
-                )}
-                <button
-                  onClick={() => handleStatusChange("false_alarm")}
-                  className="py-2.5 px-3 rounded-xl bg-[var(--bg-elevated)] hover:bg-[var(--bg-card-hover)] text-[var(--text-muted)] hover:text-white text-xs font-semibold transition-all border border-[var(--border-subtle)]"
+              {/* Action Buttons */}
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => handleStatusChange("dispatched")}
+                  disabled={isUpdating || selectedAlert.status === "dispatched"}
+                  className="h-8 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
-                  False Alarm
-                </button>
+                  <Send className="w-3 h-3 mr-1" />
+                  <span>Dispatch</span>
+                </Button>
+
+                <Button
+                  size="sm"
+                  onClick={() => handleStatusChange("resolved")}
+                  disabled={isUpdating || selectedAlert.status === "resolved"}
+                  className="h-8 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white"
+                >
+                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                  <span>Resolve</span>
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleStatusChange("false_alarm")}
+                  disabled={isUpdating}
+                  className="h-8 text-xs text-muted-foreground hover:text-destructive"
+                >
+                  <XCircle className="w-3 h-3 mr-1" />
+                  <span>False</span>
+                </Button>
               </div>
-            </div>
+            </Card>
           )}
         </div>
 
-        {/* Right Side: Interactive Mapbox Canvas (8 cols) */}
-        <div className="lg:col-span-8 rounded-2xl overflow-hidden border border-[var(--border-subtle)] relative">
+        {/* ════ RIGHT COLUMN: Full Mapbox Vector Radar Canvas (8 cols) ════ */}
+        <div className="lg:col-span-8 rounded-2xl overflow-hidden border border-border/80 relative min-h-[400px]">
           <MapboxView
             alerts={filteredAlerts}
             selectedAlertId={selectedAlert?.id}
             onSelectAlert={(a) => setSelectedAlertId(a.id)}
+            mapStyle={mapStyle}
             zoom={13}
             interactive={true}
             showControls={true}
             agencyLocation={
               agency
                 ? {
-                    latitude: agency.latitude || 15.5007,
-                    longitude: agency.longitude || 32.5599,
+                    latitude: agency.location?.lat || agency.latitude || 15.5007,
+                    longitude: agency.location?.lng || agency.longitude || 32.5599,
                     name: agency.name,
                   }
                 : undefined
@@ -257,5 +311,5 @@ export default function LiveMapCommandPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
