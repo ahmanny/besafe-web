@@ -81,9 +81,6 @@ export default function LandingPage() {
             <a href="#features" className="hover:text-white transition-colors">
               Capabilities
             </a>
-            <a href="#how-it-works" className="hover:text-white transition-colors">
-              Safety Mesh
-            </a>
             <a href="#perspectives" className="hover:text-white transition-colors">
               Citizen vs Agency
             </a>
@@ -94,6 +91,7 @@ export default function LandingPage() {
               FAQ
             </a>
           </nav>
+
 
           <div className="flex items-center space-x-3">
             <Link
@@ -578,13 +576,9 @@ export default function LandingPage() {
               Mobile App
             </a>
           </div>
-
-          <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
-            <span>Operational Mesh Active</span>
-          </div>
         </div>
       </footer>
+
     </div>
   );
 }
